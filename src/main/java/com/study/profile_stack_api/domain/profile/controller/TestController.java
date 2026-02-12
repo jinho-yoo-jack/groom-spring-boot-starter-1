@@ -1,4 +1,4 @@
-package com.study.profile_stack_api.profile.controller;
+package com.study.profile_stack_api.domain.profile.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

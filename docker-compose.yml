@@ -15,9 +15,9 @@ services:
       TZ: ${TZ:-Asia/Seoul}                         # 컨테이너 내부 타임존
     volumes:        # 볼륨 마운트, 데이터 영속화 및 파일 연결 - 여기 좀 헷갈림
       - mysql-data:/var/lib/mysql     # [mysql Named Volume] : [파일 위치] => MySQL 데이터를 컨테이너 네임드 저장소에 연결하여 저장
-      - ./src/main/resources/db:/docker-entrypoint-initdb.d:ro
-      #- ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql # [파일 위치 - Bind Mount] : [컨테이너 내부 경로] => 파일을 해당 디랙토리 내부에 그대로 연결
-      #- ./src/main/resources/db/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      #- ./src/main/resources/db:/docker-entrypoint-initdb.d:ro
+      - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql # [파일 위치 - Bind Mount] : [컨테이너 내부 경로] => 파일을 해당 디랙토리 내부에 그대로 연결
+      - ./src/main/resources/db/data.sql:/docker-entrypoint-initdb.d/02-data.sql
     command:      # MySQL 실행 시 옵션
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci

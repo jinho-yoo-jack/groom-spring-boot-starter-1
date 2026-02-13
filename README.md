@@ -207,7 +207,7 @@ curl -X POST http://localhost:8080/api/v1/profiles/1/tech-stacks \
 ### Phase 1: 기본 설정
 - [ ] Spring Boot 프로젝트 설정
 - [ ] application.yml 작성
-- [ ] 01-schema.sql, 02-data.sql 작성
+- [ ] schema.sql, data.sql 작성
 - [ ] H2 Console 연결 확인
 
 ### Phase 2: 공통 모듈

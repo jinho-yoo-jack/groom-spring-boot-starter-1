@@ -1,6 +1,7 @@
 package com.study.profile_stack_api.domain.profile.service;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
@@ -10,6 +11,7 @@ import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,6 +114,51 @@ public class ProfileService {
                 .collect(Collectors.toList());
     }
 
+    // ==================== UPDATE ====================
+
+    public ProfileResponse updateProfile(Long id, ProfileUpdateRequest request) {
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(request);
+
+        // 기존 프로필 조회
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() -> new ProfileNotFoundException(id));
+
+        // 수정 내용 있는지 확인
+        if (request.hashNoUpdates()) {
+            throw new IllegalArgumentException("수정 내용이 없습니다.");
+        }
+
+        // 수정값 유효성 검증
+        validataUpdateRequest(request);
+
+        // 직무 변환 (Null 아닌 경우에만)
+        Position position = null;
+        if (request.getPosition() != null) {
+            try {
+                position = Position.valueOf(request.getPosition().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("유효하지 않은 직무 입니다.");
+            }
+        }
+
+        // Entity 업데이트 (Null이 아닌 값만 반영)
+        profile.update(
+                request.getName(),
+                request.getEmail(),
+                request.getBio(),
+                position,
+                request.getCareerYears(),
+                request.getGithubUrl(),
+                request.getBlogUrl()
+        );
+
+        // 저장 및 응답 반환
+        Profile updatedProfile = profileRepository.update(profile);
+        return ProfileResponse.from(updatedProfile);
+    }
+
+
     // ==================== VALIDATION ====================
 
     /**
@@ -147,6 +194,41 @@ public class ProfileService {
         }
 
         if (request.getCareerYears() == null || request.getCareerYears() < 0) {
+            throw new IllegalArgumentException("경력은 0년 이상이어야 합니다.");
+        }
+    }
+
+    public void validataUpdateRequest(ProfileUpdateRequest request) {
+        if (request.getName() != null) {
+            if (request.getName().trim().isEmpty()) {
+                throw new IllegalArgumentException("이름은 빈 값일 수 없습니다.");
+            }
+            if (request.getName().length() > 50) {
+                throw new IllegalArgumentException("이름은 50자를 초과할 수 없습니다.");
+            }
+        }
+
+        if (request.getEmail() != null) {
+            if (request.getEmail().trim().isEmpty()) {
+                throw new IllegalArgumentException("이메일은 빈 값일 수 없습니다.");
+            }
+            if (request.getEmail().length() > 100) {
+                throw new IllegalArgumentException("이메일은 100자를 초과할 수 없습니다.");
+            }
+            if (profileRepository.existsByEmail(request.getEmail())) {
+                throw new DuplicateEmailException(request.getEmail());
+            }
+        }
+
+        if (request.getBio() != null && request.getBio().length() > 500) {
+            throw new IllegalArgumentException("자기소개는 500자를 초과할 수 없습니다.");
+        }
+
+        if (request.getPosition() != null && request.getPosition().trim().isEmpty()) {
+            throw new IllegalArgumentException("직무는 빈 값일 수 없습니다.");
+        }
+
+        if (request.getCareerYears() != null && request.getCareerYears() < 0) {
             throw new IllegalArgumentException("경력은 0년 이상이어야 합니다.");
         }
     }

@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.profile.repository;
 
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
+import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Repository;
@@ -72,6 +73,22 @@ public class ProfileRepository {
                 .filter(profile -> profile.getPosition().equals(position))
                 .sorted(Comparator.comparing(Profile::getCreatedAt))
                 .collect(Collectors.toList());
+    }
+
+    // ==================== UPDATE ====================
+
+    /**
+     * 프로필 수정
+     */
+    public Profile update(Profile profile) {
+        if (profile.getId() == null) {
+            throw new IllegalArgumentException("수정할 프로필의 ID가 없습니다.");
+        }
+        if (!database.containsKey(profile.getId())) {
+            throw new ProfileNotFoundException(profile.getId());
+        }
+        database.put(profile.getId(), profile);
+        return profile;
     }
 
     // ==================== VALIDATION ====================

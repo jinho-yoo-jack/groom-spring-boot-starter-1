@@ -1,6 +1,7 @@
 package com.study.profile_stack_api.domain.profile.controller;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
@@ -46,7 +47,7 @@ public class ProfileController {
                 .body(ApiResponse.success(response));
     }
 
-    // ==================== CREATE ====================
+    // ==================== READ ====================
 
     /**
      * 모든 프로필 조회
@@ -99,5 +100,22 @@ public class ProfileController {
         return ResponseEntity
                 .ok()
                 .body(ApiResponse.success(responses));
+    }
+
+    // ==================== UPDATE ====================
+
+    /**
+     * 프로필 수정
+     * PUT /api/v1/profiles/{id}
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProfileResponse>> updateProfile(
+        @PathVariable
+        Long id,
+        @RequestBody
+        ProfileUpdateRequest request
+    ) {
+        ProfileResponse response = profileService.updateProfile(id, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

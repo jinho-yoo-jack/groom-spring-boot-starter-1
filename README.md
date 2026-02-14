@@ -205,19 +205,20 @@ curl -X POST http://localhost:8080/api/v1/profiles/1/tech-stacks \
 ## 구현 체크리스트
 
 ### Phase 1: 기본 설정
-- [ ] Spring Boot 프로젝트 설정
-- [ ] application.yml 작성
-- [ ] schema.sql, data.sql 작성
-- [ ] H2 Console 연결 확인
+- [x] Spring Boot 프로젝트 설정
+- [x] application.yml 작성
+- [x] schema.sql, data.sql 작성
+- [x] MySQL 연결 확인
 
 ### Phase 2: 공통 모듈
 - [ ] ApiResponse 클래스 구현
 - [ ] Page 클래스 구현
 - [ ] BusinessException 및 하위 예외 클래스 구현
 - [ ] GlobalExceptionHandler 구현
+- -> 아직 공통 응답 등은 배우지 않았기 때문에.. Exception이나 Page 클래스만 구현하기.
 
 ### Phase 3: Profile CRUD
-- [ ] Profile Entity 및 Enum 구현
+- [x] Profile Entity 및 Enum 구현
 - [ ] Profile DTO 구현
 - [ ] ProfileDao 인터페이스 및 구현체
 - [ ] ProfileRepository 구현

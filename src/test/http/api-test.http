@@ -1,0 +1,28 @@
+### CREATE TEST
+### 프로필 생성
+POST http://localhost:8080/api/v1/profiles
+Content-Type: application/json
+
+{
+    "name": "김자바",
+    "email": "java.kim@example.com",
+    "bio": "Spring Boot를 사랑하는 백엔드 개발자입니다.",
+    "position": "BACKEND",
+    "careerYears": 3,
+    "githubUrl": "https://github.com/javakim",
+    "blogUrl": "https://javakim.tistory.com"
+}
+
+### 이름 없는 프로필 생성 (에러 테스트)
+POST http://localhost:8080/api/v1/profiles
+Content-Type: application/json
+
+{
+  "name": "",
+  "email": "java.kim@example.com",
+  "bio": "Spring Boot를 사랑하는 백엔드 개발자입니다.",
+  "position": "BACKEND",
+  "careerYears": 3,
+  "githubUrl": "https://github.com/javakim",
+  "blogUrl": "https://javakim.tistory.com"
+}

@@ -9,20 +9,20 @@
 
 - [x]  ApiResponse 클래스 구현
 - [ ]  Page 제네릭 클래스 구현
-- [ ]  ErrorCode Enum 정의
-- [ ]  BusinessException 및 하위 예외 클래스 구현
+- [x]  ErrorCode Enum 정의
+- [x]  BusinessException 및 하위 예외 클래스 구현
 - [x]  GlobalExceptionHandler 구현
 
 ### Phase 3: Profile CRUD
 
-- [ ]  Entity 클래스 작성 (Profile, Position Enum)
-- [ ]  DTO 클래스 작성 (CreateRequest, UpdateRequest, Response)
+- [x]  Entity 클래스 작성 (Profile, Position Enum)
+- [x]  DTO 클래스 작성 (CreateRequest, UpdateRequest, Response)
 - [ ]  ProfileDao 인터페이스 정의
 - [ ]  ProfileDaoImpl 구현 (JdbcTemplate + RowMapper)
-- [ ]  ProfileRepository 구현
-- [ ]  ProfileService 구현
-- [ ]  ProfileController 구현
-- [ ]  cURL 또는 Postman으로 CRUD 테스트
+- [x]  ProfileRepository 구현
+- [x]  ProfileService 구현
+- [x]  ProfileController 구현
+- [x]  cURL 또는 Postman으로 CRUD 테스트
 
 - ### Phase 4: TechStack CRUD
 

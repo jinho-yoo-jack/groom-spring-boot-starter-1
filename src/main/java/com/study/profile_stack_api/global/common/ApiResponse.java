@@ -1,12 +1,14 @@
 package com.study.profile_stack_api.global.common;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Getter;
 
 /**
  * 공통 API 응답 래퍼 클래스
  * 모든 API 응답을 동일한 형식으로 내리기 위해 사용하는 Response 객체
  * 제네릭 타입 <T>를 사용해 어떤 타입의 데이터든 담을 수 있도록 설계
  */
+@Getter
 @JsonPropertyOrder({"success", "data", "error"})    // JSON 응답 필드 순서 고정
 public class ApiResponse<T> {
     /** 요청 성공 여부 */

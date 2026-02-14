@@ -6,7 +6,11 @@ import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
 import com.study.profile_stack_api.global.exception.DuplicateEmailException;
+import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProfileService {
@@ -48,6 +52,64 @@ public class ProfileService {
 
         // Entity -> Response DTO 변환 후 반환
         return ProfileResponse.from(savedProfile);
+    }
+
+    // ==================== READ ====================
+
+    /**
+     * 전체 프로필 조회 (최신순 정렬)
+     *
+     * @return 모든 프로필 응답 DTO 리스트
+     */
+    public List<ProfileResponse> getAllProfiles() {
+        // Repository에서 모든 프로필 조회
+        List<Profile> profiles = profileRepository.findAll();
+
+        // Entity 리스트 -> Response DTO 리스트로 변환
+        return profiles.stream()
+                .map(ProfileResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * ID로 프로필 단건 조회
+     *
+     * @param id 조회할 프로필 ID
+     * @return 프로필 응답 DTO
+     */
+    public ProfileResponse getProfileById(Long id) {
+        // Repository에서 ID로 조회, 존재하지 않으면 예외 처리
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() -> new ProfileNotFoundException(id));
+
+        // Entity -> Response DTO로 변환
+        return ProfileResponse.from(profile);
+    }
+
+    /**
+     * 직무별 프로필 조회
+     *
+     * @param positionName 조회할 직무 이름
+     * @return 직무별 프로필 응답 DTO 리스트
+     */
+    public List<ProfileResponse> getProfileByPosition(String positionName) {
+        // 직무 이름으로 해당 직무 생성, 없는 직무면 예외 처리
+        Position position;
+        try {
+            position = Position.valueOf(positionName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "유효하지 않은 직무입니다: " + positionName
+            );
+        }
+
+        // Repository에서 직무로 조회
+        List<Profile> profiles = profileRepository.findByPosition(position);
+
+        // Entity 리스트 -> Response DTO 리스트로 변환
+        return profiles.stream()
+                .map(ProfileResponse::from)
+                .collect(Collectors.toList());
     }
 
     // ==================== VALIDATION ====================

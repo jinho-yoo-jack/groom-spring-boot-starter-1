@@ -1,0 +1,87 @@
+### CREATE TEST
+### 기술 스택 생성 1
+POST http://localhost:8080/api/v1/profiles/1/tech-stacks
+Content-Type: application/json
+
+{
+  "name": "Java",
+  "category": "LANGUAGE",
+  "proficiency": "ADVANCED",
+  "yearsOfExp": 3
+}
+
+### 기술 스택 생성 2
+POST http://localhost:8080/api/v1/profiles/1/tech-stacks
+Content-Type: application/json
+
+{
+  "name": "Spring Boot",
+  "category": "FRAMEWORK",
+  "proficiency": "INTERMEDIATE",
+  "yearsOfExp": 2
+}
+
+### 기술 스택 생성 3
+POST http://localhost:8080/api/v1/profiles/1/tech-stacks
+Content-Type: application/json
+
+{
+  "name": "MySQL",
+  "category": "DATABASE",
+  "proficiency": "INTERMEDIATE",
+  "yearsOfExp": 2
+}
+
+### 기술 스택 생성 4
+POST http://localhost:8080/api/v1/profiles/2/tech-stacks
+Content-Type: application/json
+
+{
+  "name": "JavaScript",
+  "category": "LANGUAGE",
+  "proficiency": "ADVANCED",
+  "yearsOfExp": 2
+}
+
+### 기술 스택 생성 5
+POST http://localhost:8080/api/v1/profiles/3/tech-stacks
+Content-Type: application/json
+
+{
+  "name": "Java",
+  "category": "LANGUAGE",
+  "proficiency": "EXPERT",
+  "yearsOfExp": 5
+}
+
+### 존재하지 않은 프로필에 기술 스택 생성 (에러 테스트)
+POST http://localhost:8080/api/v1/profiles/999/tech-stacks
+Content-Type: application/json
+
+{
+  "name": "Kotlin",
+  "category": "LANGUAGE",
+  "proficiency": "ADVANCED",
+  "yearsOfExp": 10
+}
+
+### 이름 없는 기술 스택 생성 (에러 테스트)
+POST http://localhost:8080/api/v1/profiles/1/tech-stacks
+Content-Type: application/json
+
+{
+  "name": "",
+  "category": "LANGUAGE",
+  "proficiency": "ADVANCED",
+  "yearsOfExp": 10
+}
+
+### READ TEST
+### 전체 목록 조회
+GET http://localhost:8080/api/v1/profiles/1/tech-stacks
+
+### ID로 단건 조회
+GET http://localhost:8080/api/v1/profiles/1/tech-stacks/1
+
+### 존재하지 않는 ID 조회 (에러 테스트)
+GET http://localhost:8080/api/v1/profiles/1/tech-stacks/999

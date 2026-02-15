@@ -1,11 +1,13 @@
 package com.study.profile_stack_api.domain.techstack.repository;
 
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * 기술 스택 저장소
@@ -21,10 +23,10 @@ public class TechStackRepository {
     // ==================== CREATE ====================
 
     /**
-     * 기술 스택 저장
+     * 프로필별 기술 스택 저장
      *
      * @param techStack 저장할 기술 스택
-     * @return 저장된 기술 스댁 (ID 포함)
+     * @return 저장된 기술 스택 (ID 포함)
      */
     public TechStack save(TechStack techStack) {
         // ID 없는 경우 생성
@@ -33,5 +35,52 @@ public class TechStackRepository {
         }
         database.put(techStack.getId(), techStack);
         return techStack;
+    }
+
+    // ==================== READ ====================
+
+    /**
+     * 프로필별 기술 스택 전체 조회 (최신순 정렬)
+     *
+     * @return 프로필별 기술 스택 전체 리스트
+     */
+    public List<TechStack> findAllByProfileId(Long profileId) {
+        return database.values().stream()
+                .filter(techStack -> techStack.getProfileId().equals(profileId))
+                .sorted(Comparator.comparing(TechStack::getCreatedAt))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 프로필별 기술 스택 ID로 단건 조회
+     *
+     * @param id 조회할 기술 스택 ID
+     * @return 기술 스택 (없다면 Null)
+     */
+    public Optional<TechStack> findByProfileIdAndId(Long profileId, Long id) {
+        return Optional.ofNullable(database.get(id))
+                .filter(techStack -> techStack.getProfileId().equals(profileId));
+    }
+
+    // ==================== LIFECYCLE CALLBACK ====================
+
+    @PostConstruct
+    public void init() {
+        System.out.println("========================================");
+        System.out.println("🚀 TechStackRepository 초기화 완료!");
+        System.out.println(" - 데이터 저장소(MAP) 준비됨");
+        System.out.println(" - ID 생성기 준비됨");
+        System.out.println("========================================");
+    }
+
+    @PreDestroy
+    public void destroy() {
+        System.out.println("========================================");
+        System.out.println("🔚 TechStackRepository 정리 중...");
+        System.out.println(" - 저장된 데이터 수: " + database.size() + "개");
+        System.out.println(" - 마지막 ID: " + (sequence.get() - 1));
+        database.clear();
+        System.out.println(" - 데이터 정리 완료!");
+        System.out.println("========================================");
     }
 }

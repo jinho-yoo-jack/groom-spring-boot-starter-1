@@ -9,7 +9,11 @@ import com.study.profile_stack_api.domain.techstack.entity.TechCategory;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
 import com.study.profile_stack_api.domain.techstack.repository.TechStackRepository;
 import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
+import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 기술 스택 서비스
@@ -31,18 +35,17 @@ public class TechStackService {
     // ==================== CREATE ====================
 
     /**
-     * 기술 스택 생성
+     * 프로필별 기술 스택 생성
      *
      * @param request 생성 요청 DTO
      * @return 생성된 기술 스택 응담 DTO
      */
-    public TechStackResponse createTechStack(Long profileId, TechStackCreateRequest request) {
+    public TechStackResponse createTechStackByProfileId(Long profileId, TechStackCreateRequest request) {
         // 유효성 검증
         validataCreateRequest(request);
 
         // FK 검증
-        Profile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ProfileNotFoundException(profileId));
+        Profile profile = validataProfileId(profileId);
 
         // DTO -> Entity변환
         TechStack techStack = new TechStack(
@@ -61,7 +64,53 @@ public class TechStackService {
         return TechStackResponse.from(savedTechStack);
     }
 
+    // ==================== READ ====================
+
+    /**
+     * 프로필별 기술 스택 전체 조회 (최신순 정렬)
+     *
+     * @return 프로필별 기술 스택 전체 응답 DTO 리스트
+     */
+    public List<TechStackResponse> getAllTechStacksByProfileId(Long profileId) {
+        // FK 검증
+        validataProfileId(profileId);
+
+        // Repository에서 profileId에 해당하는 기술 스택만 조회
+        List<TechStack> techStacks = techStackRepository.findAllByProfileId(profileId);
+
+        // Entity 리스트 -> Response DTO 리스트로 변환
+        return techStacks.stream()
+                .map(TechStackResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 프로필별 기술 스택 ID로 단건 조회
+     *
+     * @param id 조회할 기술 스택 ID
+     * @return 기술 스택 응답 DTO
+     */
+    public TechStackResponse getTechStackByProfileIdAndId(Long profileId, Long id) {
+        // FK 검증
+        validataProfileId(profileId);
+
+        // Repository에서 profileId + id로 조회, 존재하지 않으면 예외 처리
+        TechStack techStack = techStackRepository.findByProfileIdAndId(profileId, id)
+                .orElseThrow(() -> new TechStackNotFoundException(id));
+
+        // Entity -> Response DTO로 변환
+        return TechStackResponse.from(techStack);
+    }
+
     // ==================== VALIDATION ====================
+
+    /**
+     * 프로필과 기술 스택의 FK 검증
+     */
+    private Profile validataProfileId(Long profileId) {
+        return profileRepository.findById(profileId)
+                .orElseThrow(() -> new ProfileNotFoundException(profileId));
+    }
 
     /**
      * 생성 요청 유효성 검증

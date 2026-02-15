@@ -1,4 +1,3 @@
-########## Profile
 ### CREATE TEST
 ### 프로필 생성 1
 POST http://localhost:8080/api/v1/profiles
@@ -141,72 +140,3 @@ DELETE http://localhost:8080/api/v1/profiles/99
 
 ### 전체 프로필 삭제
 DELETE http://localhost:8080/api/v1/profiles
-
-
-########## TechStack
-### CREATE TEST
-### 기술 스택 생성 1
-POST http://localhost:8080/api/v1/profiles/1/tech-stacks
-Content-Type: application/json
-
-{
-    "name": "Java",
-    "category": "LANGUAGE",
-    "proficiency": "ADVANCED",
-    "yearsOfExp": 3
-}
-
-### 기술 스택 생성 2
-POST http://localhost:8080/api/v1/profiles/1/tech-stacks
-Content-Type: application/json
-
-{
-  "name": "Spring Boot",
-  "category": "FRAMEWORK",
-  "proficiency": "INTERMEDIATE",
-  "yearsOfExp": 2
-}
-
-### 기술 스택 생성 3
-POST http://localhost:8080/api/v1/profiles/1/tech-stacks
-Content-Type: application/json
-
-{
-  "name": "MySQL",
-  "category": "DATABASE",
-  "proficiency": "INTERMEDIATE",
-  "yearsOfExp": 2
-}
-
-### 기술 스택 생성 4
-POST http://localhost:8080/api/v1/profiles/2/tech-stacks
-Content-Type: application/json
-
-{
-  "name": "JavaScript",
-  "category": "LANGUAGE",
-  "proficiency": "ADVANCED",
-  "yearsOfExp": 2
-}
-
-### 기술 스택 생성 5
-POST http://localhost:8080/api/v1/profiles/3/tech-stacks
-Content-Type: application/json
-
-{
-  "name": "Java",
-  "category": "LANGUAGE",
-  "proficiency": "EXPERT",
-  "yearsOfExp": 5
-}
-
-### 존재하지 않은 프로필에 기술 스택 생성
-POST http://localhost:8080/api/v1/profiles/999/tech-stacks
-Content-Type: application/json
-
-{
-"name": "Kotlin",
-"category": "LANGUAGE",
-"proficiency": "ADVANCED",
-"yearsOfExp": 10
-}

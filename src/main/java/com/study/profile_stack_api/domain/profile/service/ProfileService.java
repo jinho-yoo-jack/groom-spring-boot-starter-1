@@ -191,12 +191,12 @@ public class ProfileService {
      */
     public Map<String, Object> deleteAllProfiles() {
         // 프로필 총 개수 확인
-        long deleteCound = profileRepository.deleteAll();
+        long deleteCount = profileRepository.deleteAll();
 
         // 삭제 결과 반환
         return Map.of(
                 "message", "전체 프로필이 성공적으로 삭제되었습니다.",
-                "deletedCount", deleteCound
+                "deletedCount", deleteCount
         );
     }
 

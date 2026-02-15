@@ -4,6 +4,7 @@ import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackCreateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
+import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.entity.Proficiency;
 import com.study.profile_stack_api.domain.techstack.entity.TechCategory;
@@ -14,6 +15,7 @@ import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -61,7 +63,7 @@ public class TechStackService {
         );
 
         // 저장
-        TechStack savedTechStack = techStackRepository.save(techStack);
+        TechStack savedTechStack = techStackRepository.saveByProfileId(techStack);
 
         // Entity -> Response DTO 변환 후 반환
         return TechStackResponse.from(savedTechStack);
@@ -122,6 +124,9 @@ public class TechStackService {
         Objects.requireNonNull(id);
         Objects.requireNonNull(request);
 
+        // FK 검증
+        validataProfileId(profileId);
+
         // 기존 기술 스택 조회
         TechStack techStack = techStackRepository.findByProfileIdAndId(profileId, id)
                 .orElseThrow(() -> new TechStackNotFoundException(id));
@@ -162,8 +167,52 @@ public class TechStackService {
         );
 
         // 저장 및 응답 반환
-        TechStack updatedTechStack = techStackRepository.update(techStack);
+        TechStack updatedTechStack = techStackRepository.updateByProfileId(techStack);
         return TechStackResponse.from(updatedTechStack);
+    }
+
+    // ==================== DELETE ====================
+
+    /**
+     * 프로필별 기술 스택 단건 삭제
+     *
+     * @param profileId 삭제할 프로필 ID
+     * @param id 삭제할 기술 스택 ID
+     * @return 삭제 결과  응답
+     */
+    public TechStackDeleteResponse deleteTechStackByProfileIdAndId(Long profileId, Long id) {
+        // FK 검증
+        validataProfileId(profileId);
+
+        // ProfileId + ID에 따른 기술 스택이 있는지 확인
+        techStackRepository.findByProfileIdAndId(profileId, id)
+                .orElseThrow(() -> new TechStackNotFoundException(id));
+
+        // 삭제 수행
+        boolean isDeleted = techStackRepository.deleteByProfileIdAndId(profileId, id);
+
+        // 삭제 결과 반환
+        return TechStackDeleteResponse.of(id, isDeleted);
+    }
+
+    /**
+     * 프로필별 기술 스택 전체 삭제
+     *
+     * @param profileId 삭제할 프로필 ID
+     * @return 삭제 결과 응답
+     */
+    public Map<String, Object> deleteAllTechStackByProfileId(Long profileId) {
+        // FK 검증
+        validataProfileId(profileId);
+
+        // 프로필 총 개수 확인
+        long deleteCount = techStackRepository.deleteAllByProfileId(profileId);
+
+        // 삭제 결과 반환
+        return Map.of(
+                "message", "전체 기술 스택이 성공적으로 삭제되었습니다.",
+                "deletedCount", deleteCount
+        );
     }
 
     // ==================== VALIDATION ====================

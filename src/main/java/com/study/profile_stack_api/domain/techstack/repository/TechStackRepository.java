@@ -29,7 +29,7 @@ public class TechStackRepository {
      * @param techStack 저장할 기술 스택
      * @return 저장된 기술 스택 (ID 포함)
      */
-    public TechStack save(TechStack techStack) {
+    public TechStack saveByProfileId(TechStack techStack) {
         // ID 없는 경우 생성
         if (techStack.getId() == null) {
             techStack.setId(sequence.getAndIncrement());
@@ -66,12 +66,12 @@ public class TechStackRepository {
     // ==================== UPDATE ====================
 
     /**
-     * 기술 스택 수정
+     * 프로필별 기술 스택 수정
      *
      * @param techStack 수정할 기술 스택
      * @return 기술 스택
      */
-    public TechStack update(TechStack techStack) {
+    public TechStack updateByProfileId(TechStack techStack) {
         if (techStack.getId() == null) {
             throw new IllegalArgumentException("수정할 기술 스택의 ID가 없습니다.");
         }
@@ -80,6 +80,39 @@ public class TechStackRepository {
         }
         database.put(techStack.getId(), techStack);
         return techStack;
+    }
+
+    // ==================== DELETE ====================
+
+    /**
+     * 프로필별 기술 스택 ID로 단건 삭제
+     *
+     * @param id 삭제할 기술 스택 ID
+     * @return 삭제 성공 여부 (true: 삭제됨, false: 해당 ID 없음)
+     */
+    public boolean deleteByProfileIdAndId(Long profileId, Long id) {
+        Optional<TechStack> target = findByProfileIdAndId(profileId, id);
+        if (target.isEmpty()) {
+            return false;
+        }
+
+        database.remove(id);
+        return true;
+    }
+
+    /**
+     * 프로필별 기술 스택 전체 삭제
+     *
+     * @return 삭제된 기술 스택 수
+     */
+    public int deleteAllByProfileId(Long profileId) {
+        List<Long> idsToRemove = database.values().stream()
+                .filter(techStack -> techStack.getProfileId().equals(profileId))
+                .map(TechStack::getId)
+                .toList();
+
+        idsToRemove.forEach(database::remove);
+        return idsToRemove.size();
     }
 
     // ==================== LIFECYCLE CALLBACK ====================

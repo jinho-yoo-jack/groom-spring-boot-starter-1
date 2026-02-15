@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.techstack.controller;
 
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackCreateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
+import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.service.TechStackService;
 import com.study.profile_stack_api.global.common.ApiResponse;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 기술 스택 컨트롤러
@@ -108,6 +110,36 @@ public class TechStackController {
         TechStackResponse response = techStackService.updateTechStackByProfileId(profileId, id, request);
 
         // 200 OK 상태 코드와 함께 응답
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    // ==================== DELETE ====================
+
+    /**
+     * 프로필별 기술 스택 단건 삭제
+     * DELETE /api/v1/profiles/{profileId}/tech-stacks/{id}
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<TechStackDeleteResponse>> deleteTechStackByProfileIdAndId(
+            @PathVariable
+            Long profileId,
+            @PathVariable
+            Long id
+    ) {
+        TechStackDeleteResponse response = techStackService.deleteTechStackByProfileIdAndId(profileId, id);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 프로필별 기술 스택 전체 삭제
+     * DELETE /api/v1/profiles/{profileId}/tech-stacks
+     */
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Map<String, Object>>> deleteAllTechStackByProfileId(
+            @PathVariable
+            Long profileId
+    ) {
+        Map<String, Object> response = techStackService.deleteAllTechStackByProfileId(profileId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

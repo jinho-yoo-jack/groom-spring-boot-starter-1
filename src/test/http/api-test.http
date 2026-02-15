@@ -127,3 +127,16 @@ PUT http://localhost:8080/api/v1/profiles/1
 Content-Type: application/json
 
 {"position": "INVALID"}
+
+### DLETE TEST
+### ID가 1인 프로필 삭제
+DELETE http://localhost:8080/api/v1/profiles/1
+
+### 삭제된 ID로 조회 시도
+GET http://localhost:8080/api/v1/profiles/1
+
+### 존재하지 않는 ID 삭제 시도
+DELETE http://localhost:8080/api/v1/profiles/99
+
+### 전체 프로필 삭제
+DELETE http://localhost:8080/api/v1/profiles

@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.profile.service;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
+import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
@@ -11,6 +12,7 @@ import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -158,6 +160,42 @@ public class ProfileService {
         return ProfileResponse.from(updatedProfile);
     }
 
+    // ==================== DELETE ====================
+
+    /**
+     * 프로필 한개를 삭제
+     *
+     * @param id 삭제할 프로필 ID
+     * @return 삭제 결과  응답
+     */
+    public ProfileDeleteResponse deleteProfile(Long id) {
+        // ID에 따른 프로필이 있는지 확인
+        if (!profileRepository.existsById(id)) {
+            throw new ProfileNotFoundException(id);
+        }
+
+        // 삭제 수행
+        boolean isDeleted = profileRepository.deleteById(id);
+
+        // 삭제 결과 반환
+        return ProfileDeleteResponse.of(id, isDeleted);
+    }
+
+    /**
+     * 전체 프로필 삭제
+     *
+     * @return 삭제 결과 응답
+     */
+    public Map<String, Object> deleteAllProfiles() {
+        // 프로필 총 개수 확인
+        long deleteCound = profileRepository.deleteAll();
+
+        // 삭제 결과 반환
+        return Map.of(
+                "message", "전체 프로필이 성공적으로 삭제되었습니다.",
+                "deletedCount", deleteCound
+        );
+    }
 
     // ==================== VALIDATION ====================
 

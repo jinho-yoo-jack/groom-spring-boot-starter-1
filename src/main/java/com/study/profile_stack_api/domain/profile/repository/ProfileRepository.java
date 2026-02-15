@@ -91,12 +91,52 @@ public class ProfileRepository {
         return profile;
     }
 
+    // ==================== DELETE ====================
+
+    /**
+     * ID로 프로필 삭제
+     *
+     * @param id 삭제할 프로필 ID
+     * @return 삭제 성공 여부 (true: 삭제됨, false: 해당 ID 없음)
+     */
+    public boolean deleteById(Long id) {
+        Profile removed = database.remove(id);
+        return removed != null;
+    }
+
+    /**
+     * 전체 프로필 삭제
+     *
+     * @return 삭제된 프로필 수
+     */
+    public int deleteAll() {
+        int count = database.size();
+        database.clear();
+        return count;
+    }
+
     // ==================== VALIDATION ====================
 
+    /**
+     * 이메일에 해당하는 프로필이 있는지 확인
+     *
+     * @param email 확인할 프로필 이메일
+     * @return 존재여부
+     */
     public boolean existsByEmail(String email) {
         return database.values().stream()
                 .anyMatch(profile -> profile.getEmail() != null
                         && profile.getEmail().equalsIgnoreCase(email));
+    }
+
+    /**
+     * ID에 해당하는 프로필이 있는지 확인
+     *
+     * @param id 확인할 프로필 ID
+     * @return 존재여부
+     */
+    public boolean existsById(Long id) {
+        return database.containsKey(id);
     }
 
     // ==================== LIFECYCLE CALLBACK ====================

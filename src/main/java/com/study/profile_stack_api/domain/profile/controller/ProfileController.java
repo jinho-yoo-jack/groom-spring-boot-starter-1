@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.profile.controller;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
+import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 프로필 컨트롤러
@@ -116,6 +118,31 @@ public class ProfileController {
         ProfileUpdateRequest request
     ) {
         ProfileResponse response = profileService.updateProfile(id, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    // ==================== DELETE ====================
+
+    /**
+     * 프로필 한개를 삭제
+     * DELETE /api/v1/profiles/{id}
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProfileDeleteResponse>> deleteProfile(
+            @PathVariable
+            Long id
+    ) {
+        ProfileDeleteResponse response = profileService.deleteProfile(id);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * 전체 프로필 삭제
+     * DELETE /api/v1/profiles
+     */
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Map<String, Object>>> deleteAllProfiles() {
+        Map<String, Object> response = profileService.deleteAllProfiles();
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

@@ -3,6 +3,7 @@ package com.study.profile_stack_api.domain.techstack.service;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackCreateRequest;
+import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.entity.Proficiency;
 import com.study.profile_stack_api.domain.techstack.entity.TechCategory;
@@ -13,6 +14,7 @@ import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +39,7 @@ public class TechStackService {
     /**
      * 프로필별 기술 스택 생성
      *
+     * @param profileId 생성할 프로필 ID
      * @param request 생성 요청 DTO
      * @return 생성된 기술 스택 응담 DTO
      */
@@ -69,6 +72,7 @@ public class TechStackService {
     /**
      * 프로필별 기술 스택 전체 조회 (최신순 정렬)
      *
+     * @param profileId 조회할 프로필 ID
      * @return 프로필별 기술 스택 전체 응답 DTO 리스트
      */
     public List<TechStackResponse> getAllTechStacksByProfileId(Long profileId) {
@@ -87,6 +91,7 @@ public class TechStackService {
     /**
      * 프로필별 기술 스택 ID로 단건 조회
      *
+     * @param profileId 조회할 프로필 ID
      * @param id 조회할 기술 스택 ID
      * @return 기술 스택 응답 DTO
      */
@@ -100,6 +105,65 @@ public class TechStackService {
 
         // Entity -> Response DTO로 변환
         return TechStackResponse.from(techStack);
+    }
+
+    // ==================== UPDATE ====================
+
+    /**
+     * 프로필별 기술 스택 수정
+     *
+     * @param profileId 수정할 프로필 ID
+     * @param id 수정할 기술 스택 ID
+     * @param request 수정 요청 데이터
+     * @return 수정된 기술 스택 응답
+     */
+    public TechStackResponse updateTechStackByProfileId(Long profileId, Long id, TechStackUpdateRequest request) {
+        Objects.requireNonNull(profileId);
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(request);
+
+        // 기존 기술 스택 조회
+        TechStack techStack = techStackRepository.findByProfileIdAndId(profileId, id)
+                .orElseThrow(() -> new TechStackNotFoundException(id));
+
+        // 수정 내용 있는지 확인
+        if (request.hashNoUpdates()) {
+            throw new IllegalArgumentException("수정 내용이 없습니다.");
+        }
+
+        // 수정값 유효성 검증
+        validataUpdateRequest(request);
+
+        // 기술 카테고리 및 숙련도 변환 (Null 아닌 경우에만)
+        TechCategory category = null;
+        Proficiency proficiency = null;
+        if (request.getCategory() != null) {
+            try {
+                category = TechCategory.valueOf(request.getCategory().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("유효하지 않은 기술 스택 입니다.");
+            }
+        }
+
+        if (request.getProficiency() != null) {
+            try {
+                proficiency = Proficiency.valueOf(request.getProficiency().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("유효하지 않은 숙련도 입니다.");
+            }
+        }
+
+        // Entity 업데이트 (Null이 아닌 값만 반영)
+        techStack.update(
+                request.getName(),
+                category,
+                proficiency,
+                request.getYearsOfExp()
+        );
+
+        // 저장 및 응답 반환
+        TechStack updatedTechStack = techStackRepository.update(techStack);
+        return TechStackResponse.from(updatedTechStack);
     }
 
     // ==================== VALIDATION ====================
@@ -133,6 +197,32 @@ public class TechStackService {
         }
 
         if (request.getYearsOfExp() == null || request.getYearsOfExp() < 0) {
+            throw new IllegalArgumentException("사용 경험은 0년 이상이어야 합니다.");
+        }
+    }
+
+    /**
+     * 수정 요청 유효성 검증
+     */
+    public void validataUpdateRequest(TechStackUpdateRequest request) {
+        if (request.getName() != null) {
+            if (request.getName().trim().isEmpty()) {
+                throw new IllegalArgumentException("기술명은 빈 값일 수 없습니다.");
+            }
+            if (request.getName().length() > 50) {
+                throw new IllegalArgumentException("기술명은 50자를 초과할 수 없습니다.");
+            }
+        }
+
+        if (request.getCategory() != null && request.getCategory().trim().isEmpty()) {
+            throw new IllegalArgumentException("기술 카테고리는 빈 값일 수 없습니다.");
+        }
+
+        if (request.getProficiency() != null && request.getProficiency().trim().isEmpty()) {
+            throw new IllegalArgumentException("숙련도는 빈 값일 수 없습니다.");
+        }
+
+        if (request.getYearsOfExp() != null && request.getYearsOfExp() < 0) {
             throw new IllegalArgumentException("사용 경험은 0년 이상이어야 합니다.");
         }
     }

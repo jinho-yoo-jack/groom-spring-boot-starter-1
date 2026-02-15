@@ -1,6 +1,7 @@
 package com.study.profile_stack_api.domain.techstack.repository;
 
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Repository;
@@ -60,6 +61,25 @@ public class TechStackRepository {
     public Optional<TechStack> findByProfileIdAndId(Long profileId, Long id) {
         return Optional.ofNullable(database.get(id))
                 .filter(techStack -> techStack.getProfileId().equals(profileId));
+    }
+
+    // ==================== UPDATE ====================
+
+    /**
+     * 기술 스택 수정
+     *
+     * @param techStack 수정할 기술 스택
+     * @return 기술 스택
+     */
+    public TechStack update(TechStack techStack) {
+        if (techStack.getId() == null) {
+            throw new IllegalArgumentException("수정할 기술 스택의 ID가 없습니다.");
+        }
+        if (!database.containsKey(techStack.getId())) {
+            throw new TechStackNotFoundException(techStack.getId());
+        }
+        database.put(techStack.getId(), techStack);
+        return techStack;
     }
 
     // ==================== LIFECYCLE CALLBACK ====================

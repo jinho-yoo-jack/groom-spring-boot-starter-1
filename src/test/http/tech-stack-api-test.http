@@ -85,3 +85,42 @@ GET http://localhost:8080/api/v1/profiles/1/tech-stacks/1
 
 ### 존재하지 않는 ID 조회 (에러 테스트)
 GET http://localhost:8080/api/v1/profiles/1/tech-stacks/999
+
+### UPDATE TEST
+### 숙련도와 사용 경험만 수정
+PUT http://localhost:8080/api/v1/profiles/1/tech-stacks/1
+Content-Type: application/json
+
+{
+  "proficiency": "INTERMEDIATE",
+  "yearsOfExp": 2
+}
+
+### 전체 내용 수정
+PUT http://localhost:8080/api/v1/profiles/1/tech-stacks/1
+Content-Type: application/json
+
+{
+  "name": "JavaScript",
+  "category": "LANGUAGE",
+  "proficiency": "ADVANCED",
+  "yearsOfExp": 3
+}
+
+### 존재하지 않는 ID
+PUT http://localhost:8080/api/v1/profiles/1/tech-stacks/999
+Content-Type: application/json
+
+{"name": "테스트"}
+
+### 빈 요청 (수정할 내용 없음)
+PUT http://localhost:8080/api/v1/profiles/1/tech-stacks/1
+Content-Type: application/json
+
+{}
+
+### 유효하지 않은 기술 스택
+PUT http://localhost:8080/api/v1/profiles/1/tech-stacks/1
+Content-Type: application/json
+
+{"category": "INVALID"}

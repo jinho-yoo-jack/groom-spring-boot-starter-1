@@ -1,6 +1,7 @@
 package com.study.profile_stack_api.domain.techstack.controller;
 
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackCreateRequest;
+import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.service.TechStackService;
 import com.study.profile_stack_api.global.common.ApiResponse;
@@ -39,7 +40,7 @@ public class TechStackController {
             @RequestBody
             TechStackCreateRequest request
     ) {
-        // Service 호출하여 프로필 생성
+        // Service 호출하여 기술 스택 생성
         TechStackResponse response = techStackService.createTechStackByProfileId(profileId, request);
 
         // 201 CREATED 상태코드와 함께 응답
@@ -59,7 +60,7 @@ public class TechStackController {
             @PathVariable
             Long profileId
     ) {
-        // Service 호출하여 모든 프로필 조회
+        // Service 호출하여 모든 기술 스택 조회
         List<TechStackResponse> responses = techStackService.getAllTechStacksByProfileId(profileId);
 
         // 200 OK 상태 코드와 함께 응답
@@ -79,12 +80,34 @@ public class TechStackController {
             @PathVariable
             Long id
     ) {
-        // Service 호출하여 ID로 프로필 조회
+        // Service 호출하여 ID로 기술 스택 조회
         TechStackResponse response = techStackService.getTechStackByProfileIdAndId(profileId, id);
 
         // 200 OK 상태 코드와 함께 응답
         return ResponseEntity
                 .ok()
                 .body(ApiResponse.success(response));
+    }
+
+    // ==================== UPDATE ====================
+
+    /**
+     * 프로필별 기술 스택 수정
+     * PUT /api/v1/profiles/{profileId}/tech-stacks/{id}
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<TechStackResponse>> updateTechStackByProfileId(
+            @PathVariable
+            Long profileId,
+            @PathVariable
+            Long id,
+            @RequestBody
+            TechStackUpdateRequest request
+    ) {
+        // Service 호출하여 ID로 기술 스택 수정
+        TechStackResponse response = techStackService.updateTechStackByProfileId(profileId, id, request);
+
+        // 200 OK 상태 코드와 함께 응답
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

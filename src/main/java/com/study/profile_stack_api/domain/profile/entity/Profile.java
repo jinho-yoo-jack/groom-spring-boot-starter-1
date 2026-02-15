@@ -5,6 +5,9 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+/**
+ * 프로필 Entity
+ */
 @Getter
 @Setter
 public class Profile {
@@ -17,7 +20,7 @@ public class Profile {
     private String githubUrl;
     private String blogUrl;
     private LocalDateTime createdAt;
-    private LocalDateTime updateAd;
+    private LocalDateTime updateAt;
 
     public Profile(Long id, String name, String email, String bio, Position position, Integer careerYears,
                    String githubUrl, String blogUrl) {
@@ -30,7 +33,7 @@ public class Profile {
         this.githubUrl = githubUrl;
         this.blogUrl = blogUrl;
         this.createdAt = LocalDateTime.now();
-        this.updateAd = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
     }
 
     /**

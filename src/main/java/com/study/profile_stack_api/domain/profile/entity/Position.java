@@ -2,6 +2,9 @@ package com.study.profile_stack_api.domain.profile.entity;
 
 import lombok.Getter;
 
+/**
+ * 직무 Enum
+ */
 @Getter
 public enum Position {
     BACKEND("⚙️", "백엔드 개발자"),

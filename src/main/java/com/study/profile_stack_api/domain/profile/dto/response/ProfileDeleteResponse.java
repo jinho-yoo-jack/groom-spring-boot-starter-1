@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * 프로필 삭제 응답 DTO
+ */
 @Getter
 @Builder
 @JsonPropertyOrder({"message", "deletedId"})

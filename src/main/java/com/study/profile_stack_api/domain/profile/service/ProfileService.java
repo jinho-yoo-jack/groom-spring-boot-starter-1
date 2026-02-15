@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * 프로필 서비스
+ */
 @Service
 public class ProfileService {
     /** 의존성 주입: Repository */

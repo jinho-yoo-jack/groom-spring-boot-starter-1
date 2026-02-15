@@ -3,6 +3,9 @@ package com.study.profile_stack_api.domain.profile.dto.request;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 프로필 생성 요청 DTO
+ */
 @Getter
 @Setter
 public class ProfileCreateRequest {

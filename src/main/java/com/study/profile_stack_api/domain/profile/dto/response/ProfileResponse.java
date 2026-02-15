@@ -6,6 +6,9 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+/**
+ * 프로필 응답 DTO
+ */
 @Getter
 @JsonPropertyOrder({
         "id", "name", "email",
@@ -38,7 +41,7 @@ public class ProfileResponse {
         response.githubUrl = profile.getGithubUrl();
         response.blogUrl = profile.getBlogUrl();
         response.createdAt = profile.getCreatedAt();
-        response.updatedAt = profile.getUpdateAd();
+        response.updatedAt = profile.getUpdateAt();
         return response;
     }
 }

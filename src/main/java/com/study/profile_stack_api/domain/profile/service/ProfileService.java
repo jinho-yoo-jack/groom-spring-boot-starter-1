@@ -1,6 +1,6 @@
 package com.study.profile_stack_api.domain.profile.service;
 
-import com.study.profile_stack_api.domain.profile.Dao.ProfileDao;
+import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.stream.events.ProcessingInstruction;
 import java.util.List;
 import java.util.stream.Collectors;
 

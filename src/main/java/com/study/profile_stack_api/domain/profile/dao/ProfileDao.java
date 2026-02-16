@@ -1,4 +1,4 @@
-package com.study.profile_stack_api.domain.profile.Dao;
+package com.study.profile_stack_api.domain.profile.dao;
 
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.global.common.Page;

@@ -60,7 +60,23 @@ public class Profile {
                     }
                     this.setCareerYears(careerYears);
                 });
+        Optional.ofNullable(profileRequest.getGithubUrl())
+                .ifPresent( githubUrl -> {
+                    if (githubUrl.length() > 200 || githubUrl.trim().isEmpty()) {
+                        throw new IllegalArgumentException("github url은 200자 이내여야 합니다.");
+                    }
+                    this.setGithubUrl(githubUrl);
+                });
+        Optional.ofNullable(profileRequest.getBlogUrl())
+                .ifPresent(blogUrl -> {
+                    if (blogUrl.length() > 200 || blogUrl.trim().isEmpty()) {
+                        throw new IllegalArgumentException("blog url은 200자 이내여야 합니다.");
+                    }
+                    this.setBlogUrl(blogUrl);
+                });
+
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     // Getter

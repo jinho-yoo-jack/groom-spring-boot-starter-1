@@ -2,21 +2,21 @@
 @contentType = application/json
 
 ### ================================
-### 1. CREATE - 학습 일지 생성
+### 1. CREATE - 프로필 생성
 ### ================================
 
-### 1-1. Spring Boot 학습 일지 생성
+### 1-1. 프로필 생성
 POST {{baseUrl}}/api/v1/profiles
 Content-Type: {{contentType}}
 
 {
-    "name": "",
-    "email": "java.park@example.com",
-    "bio": "Spring Boot를 사랑하는 백엔드 개발자입니다.",
+    "name": "김영규",
+    "email": "java.gyu@example.com",
+    "bio": "이직하고 싶어요",
     "position": "BACKEND",
-    "careerYears": 3,
-    "githubUrl": "https://github.com/javakim",
-    "blogUrl": "https://javakim.tistory.com"
+    "careerYears": 5,
+    "githubUrl": "https://github.com/KimYoungQ",
+    "blogUrl": "https://www.notion.so/YG-Dev-2e8eca6f192b802cbd82cada1ef2e823"
 }
 
 ###

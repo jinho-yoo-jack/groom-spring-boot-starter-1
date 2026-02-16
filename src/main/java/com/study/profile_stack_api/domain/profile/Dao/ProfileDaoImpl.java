@@ -8,15 +8,13 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.Timestamp;
 
 @Repository
 @Primary
 @RequiredArgsConstructor
-public class InMemoryProfileDaoImpl implements ProfileDao {
+public class ProfileDaoImpl implements ProfileDao {
 
     private final JdbcTemplate jdbcTemplate;
 

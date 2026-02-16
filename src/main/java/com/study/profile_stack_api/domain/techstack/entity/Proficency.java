@@ -13,4 +13,13 @@ public enum Proficency {
         this.description = description;
         this.icon = icon;
     }
+
+    // Getter
+    public String getDescription() {
+        return description;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
 }

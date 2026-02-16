@@ -52,14 +52,15 @@ public class Profile {
                 .map(Position::valueOf)
                 .ifPresentOrElse(
                         this::setPosition,
-                        () -> {throw new IllegalArgumentException("존재하지않는 직무 또는 필수입니다.");});
+                        () -> {throw new IllegalArgumentException("직무는 필수입니다.");});
         Optional.ofNullable(profileRequest.getCareerYears())
-                .ifPresent(careerYears -> {
-                    if (careerYears < 0) {
-                        throw new IllegalArgumentException("경력연차는 0이상이여야 합니다.");
-                    }
-                    this.setCareerYears(careerYears);
-                });
+                .ifPresentOrElse(careerYears -> {
+                            if (careerYears < 0) {
+                                throw new IllegalArgumentException("경력연차는 0이상이여야 합니다.");
+                            }
+                            this.setCareerYears(careerYears);
+                        }, () -> this.setCareerYears(0)
+                );
         Optional.ofNullable(profileRequest.getGithubUrl())
                 .ifPresent( githubUrl -> {
                     if (githubUrl.length() > 200 || githubUrl.trim().isEmpty()) {

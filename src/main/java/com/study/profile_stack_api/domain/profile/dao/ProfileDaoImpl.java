@@ -38,7 +38,7 @@ public class ProfileDaoImpl implements ProfileDao {
             ps.setString(1, profile.getName());
             ps.setString(2, profile.getEmail());
             ps.setString(3, profile.getBio());
-            ps.setString(4, profile.getPosition().name());
+            ps.setString(4, profile.getPosition().getDescription());
             ps.setInt(5, profile.getCareerYears());
             ps.setString(6, profile.getGithubUrl());
             ps.setString(7, profile.getBlogUrl());

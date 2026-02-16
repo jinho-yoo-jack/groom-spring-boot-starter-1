@@ -19,6 +19,16 @@ Content-Type: {{contentType}}
     "blogUrl": "https://www.notion.so/YG-Dev-2e8eca6f192b802cbd82cada1ef2e823"
 }
 
+### 1-2. 기술스택 생성
+POST {{baseUrl}}/api/v1/profiles/1/tech-stacks
+Content-Type: {{contentType}}
+
+{
+    "name": "Kotlin",
+    "category": "LANGUAGE",
+    "proficiency": "BEGINNER",
+    "yearsOfExp": 1
+}
 ### ================================
 ### 2. READ - 프로필 조회
 ### ================================
@@ -51,4 +61,5 @@ Content-Type: {{contentType}}
 ### ================================
 
 ### 4-1. 프로필 삭제
-DELETE {{baseUrl}}/api/v1/profiles/3
+DELETE {{baseUrl}}/api/v1/profiles/4
+

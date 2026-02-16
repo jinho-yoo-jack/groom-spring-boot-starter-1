@@ -2,19 +2,19 @@ package com.study.profile_stack_api.domain.techstack.dto.request;
 
 import java.time.LocalDateTime;
 
-public class techstackRequest {
+public class TechStackRequest {
 
     private long profileId;
     private String name;
-    private String techCategory;
-    private String techIcon;
+    private String category;
+    private String categoryIcon;
     private String proficiency;
-    private String proficiencyicon;
+    private String proficiencyIcon;
     private int yearsOfExp;
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
-    public techstackRequest() {}
+    public TechStackRequest() {}
 
     // Getter
     public long getProfileId() {
@@ -25,20 +25,20 @@ public class techstackRequest {
         return name;
     }
 
-    public String getTechCategory() {
-        return techCategory;
+    public String getCategory() {
+        return category;
     }
 
-    public String getTechIcon() {
-        return techIcon;
+    public String getCategoryIcon() {
+        return categoryIcon;
     }
 
     public String getProficiency() {
         return proficiency;
     }
 
-    public String getProficiencyicon() {
-        return proficiencyicon;
+    public String getProficiencyIcon() {
+        return proficiencyIcon;
     }
 
     public int getYearsOfExp() {
@@ -62,20 +62,20 @@ public class techstackRequest {
         this.name = name;
     }
 
-    public void setTechCategory(String techCategory) {
-        this.techCategory = techCategory;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    public void setTechIcon(String techIcon) {
-        this.techIcon = techIcon;
+    public void setCategoryIcon(String categoryIcon) {
+        this.categoryIcon = categoryIcon;
     }
 
     public void setProficiency(String proficiency) {
         this.proficiency = proficiency;
     }
 
-    public void setProficiencyicon(String proficiencyicon) {
-        this.proficiencyicon = proficiencyicon;
+    public void setProficiencyIcon(String proficiencyIcon) {
+        this.proficiencyIcon = proficiencyIcon;
     }
 
     public void setYearsOfExp(int yearsOfExp) {

@@ -1,8 +1,10 @@
 package com.study.profile_stack_api.domain.techstack.dto.response;
 
+import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+
 import java.time.LocalDateTime;
 
-public class techstackResponse {
+public class TechStackResponse {
 
     private long profileId;
     private String name;
@@ -14,7 +16,21 @@ public class techstackResponse {
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 
-    public techstackResponse() {}
+    public TechStackResponse() {}
+
+    public static TechStackResponse from(TechStack techStack) {
+        TechStackResponse response = new TechStackResponse();
+        response.name = techStack.getName();
+        response.techCategory = techStack.getTechCategory().getDescription();
+        response.techIcon = techStack.getTechCategory().getIcon();
+        response.proficiency = techStack.getProficency().getDescription();
+        response.proficiencyicon = techStack.getProficency().getIcon();
+        response.yearsOfExp = techStack.getYearsOfExp();
+        response.createdAt = techStack.getCreatedAt();
+        response.deletedAt = techStack.getUpdatedAt();
+
+        return response;
+    }
 
     // Getter & Setter
     public long getProfileId() {

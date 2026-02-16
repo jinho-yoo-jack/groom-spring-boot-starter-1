@@ -10,6 +10,7 @@ import com.study.profile_stack_api.domain.techstack.dto.response.TechStackRespon
 import com.study.profile_stack_api.domain.techstack.entity.Proficiency;
 import com.study.profile_stack_api.domain.techstack.entity.TechCategory;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import com.study.profile_stack_api.global.common.Page;
 import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ public class TechStackService {
     /** 의존성 주입: Repository */
     private final TechStackDao techStackDao;
     private final ProfileDao profileDao;
+
+    /** 페이징 관련 상수 */
+    private static final int MAX_PAGE_SIZE = 100;
 
     /**
      * 생성자 주입
@@ -91,6 +95,56 @@ public class TechStackService {
     }
 
     /**
+     * 프로필별 기술 카테고리/숙련도 조건으로 기술 스택 조회
+     *
+     * @param categoryKeyword 기술 카테고리 검색어
+     * @param proficiencyKeyword 숙련도 검색어
+     * @return 조건에 맞는 기술 스택 응답 DTO 리스트
+     */
+    public List<TechStackResponse> searchTechStackByProfileIdAndCategoryAndProficiency(
+            Long profileId, String categoryKeyword, String proficiencyKeyword
+    ) {
+        // FK 검증
+        validataProfileId(profileId);
+
+        // Repository에서 모든 프로필 조회
+        List<TechStack> techStacks = techStackDao.findAllByProfileId(profileId);
+
+        // 기술 카테고리 검색어가 없거나 빈값이 아니면 필터링
+        if (categoryKeyword != null && !categoryKeyword.isBlank()) {
+            TechCategory category;
+            try {
+                category = TechCategory.valueOf(categoryKeyword.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("유효하지 않은 기술 카테고리입니다: " + categoryKeyword);
+            }
+
+            techStacks = techStacks.stream()
+                    .filter(techStack -> techStack.getCategory() == category)
+                    .toList();
+        }
+
+        // 숙련도 검색어가 없거나 빈값이 아니면 필터링
+        if (proficiencyKeyword != null && !proficiencyKeyword.isBlank()) {
+            Proficiency proficiency;
+            try {
+                proficiency = Proficiency.valueOf(proficiencyKeyword.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("유효하지 않은 숙련도입니다: " + proficiencyKeyword);
+            }
+
+            techStacks = techStacks.stream()
+                    .filter(techStack -> techStack.getProficiency() == proficiency)
+                    .toList();
+        }
+
+        // Entity 리스트 -> Response DTO 리스트로 변환
+        return techStacks.stream()
+                .map(TechStackResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 프로필별 기술 스택 ID로 단건 조회
      *
      * @param profileId 조회할 프로필 ID
@@ -107,6 +161,119 @@ public class TechStackService {
 
         // Entity -> Response DTO로 변환
         return TechStackResponse.from(techStack);
+    }
+
+    // ==================== PAGING ====================
+
+    /**
+     * 프로필별 전체 기술 스택 페이징 조회
+     *
+     * @param page 페이지 번호 (0-based)
+     * @param size 페이지 크기
+     * @return 페이징된 기술 스택 응답
+     */
+    public Page<TechStackResponse> getTechStacksWithPaging(Long profileId, int page, int size) {
+        // FK 검증
+        validataProfileId(profileId);
+
+        // 파라미터 유효성 검증
+        page = Math.max(0, page);                           // 음수 방지
+        size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1 ~ 100 범위
+
+        // DAO에서 페이징된 Entity 조회
+        Page<TechStack> techStackPage = techStackDao.findAllWithPaging(profileId, page, size);
+
+        // Entity -> DTO 변환
+        List<TechStackResponse> content = techStackPage.getContent().stream()
+                .map(TechStackResponse::from)
+                .toList();
+
+        // Page<Entity>를 Page<DTO>로 변환 및 반환
+        return new Page<>(content, page, size, techStackPage.getTotalElements());
+    }
+
+    /**
+     * 프로필별 기술 카테고리로 기술 스택 페이징 조회
+     *
+     * @param categoryName 기술 카테고리 이름
+     * @param page 페이지 번호 (0-based)
+     * @param size 페이지 크기
+     * @return 페이징된 기술 스택 응답
+     */
+    public Page<TechStackResponse> getTechStacksByCategoryWithPaging(
+            Long profileId, String categoryName, int page, int size
+    ) {
+        // FK 검증
+        validataProfileId(profileId);
+
+        // 파라미터 유효성 검증
+        page = Math.max(0, page);                           // 음수 방지
+        size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1 ~ 100 범위
+
+        // 카테고리 유효성 검증
+        if (categoryName == null || categoryName.isBlank()) {
+            return new Page<>(List.of(), page, size, 0);
+        }
+
+        // DAO에서 페이징된 Entity 조회
+        Page<TechStack> techStackPage = techStackDao.findByCategoryWithPaging(
+                profileId, categoryName.toUpperCase(), page, size);
+
+        // Entity -> DTO 변환
+        List<TechStackResponse> content = techStackPage.getContent().stream()
+                .map(TechStackResponse::from)
+                .toList();
+
+        // Page<Entity>를 Page<DTO>로 변환 및 반환
+        return new Page<>(content, page, size, techStackPage.getTotalElements());
+    }
+
+    /**
+     * 검색 조건에 맞는 데이터를 페이징 조회
+     *
+     * @param categoryKeyword 기술 카테고리 검색어
+     * @param page 페이지 번호 (0-based)
+     * @param size 페이지 크기
+     * @return 페이징된 기술 스택 응답
+     */
+    public Page<TechStackResponse> searchTechStackWithPaging(
+            Long profileId, String categoryKeyword, String proficiencyKeyword, int page, int size) {
+        // FK 검증
+        validataProfileId(profileId);
+
+        // 파라미터 유효성 검증
+        page = Math.max(0, page);                           // 음수 방지
+        size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1 ~ 100 범위
+
+        String category = null;
+        if (categoryKeyword != null && !categoryKeyword.isBlank()) {
+            try {
+                category = TechCategory.valueOf(categoryKeyword.toUpperCase()).name();
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("유효하지 않은 기술 카테고리입니다: " + categoryKeyword);
+            }
+        }
+
+        String proficiency = null;
+        if (proficiencyKeyword != null && !proficiencyKeyword.isBlank()) {
+            try {
+                proficiency = Proficiency.valueOf(proficiencyKeyword.toUpperCase()).name();
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("유효하지 않은 숙련도입니다: " + proficiencyKeyword);
+            }
+        }
+
+        // DAO에서 페이징된 Entity 조회
+        Page<TechStack> techStackPage = techStackDao.searchWithPaging(profileId, category, proficiency, page, size);
+
+        // Entity -> DTO 변환
+        List<TechStackResponse> content = techStackPage.getContent().stream()
+                .map(TechStackResponse::from)
+                .toList();
+
+        // Page<Entity>를 Page<DTO>로 변환 및 반환
+        return new Page<>(content, page, size, techStackPage.getTotalElements());
+
     }
 
     // ==================== UPDATE ====================

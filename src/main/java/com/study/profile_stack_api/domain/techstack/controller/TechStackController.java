@@ -6,6 +6,7 @@ import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDelete
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.service.TechStackService;
 import com.study.profile_stack_api.global.common.ApiResponse;
+import com.study.profile_stack_api.global.common.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,14 +57,27 @@ public class TechStackController {
     /**
      * 프로필별 기술 스택 전체 조회
      * GET /api/v1/profiles/{profileId}/tech-stacks
+     * GET /api/v1/profiles/{profileId}/tech-stacks?category={category}
+     * GET /api/v1/profiles/{profileId}/tech-stacks?proficiency={proficiency}
      */
-    @GetMapping
+    @GetMapping(params = {"!page", "!size"})
     public ResponseEntity<ApiResponse<List<TechStackResponse>>> getAllTechStacksByProfileId(
+            @RequestParam(required = false)
+            String category,
+            @RequestParam(required = false)
+            String proficiency,
             @PathVariable
             Long profileId
     ) {
-        // Service 호출하여 모든 기술 스택 조회
-        List<TechStackResponse> responses = techStackService.getAllTechStacksByProfileId(profileId);
+        List<TechStackResponse> responses;
+
+        if ((category != null && !category.isBlank()) || (proficiency != null && !proficiency.isBlank())) {
+            // Service 호출하여 조건에 맞는 기술 스택 조회
+            responses = techStackService.searchTechStackByProfileIdAndCategoryAndProficiency(profileId, category, proficiency);
+        } else {
+            // Service 호출하여 모든 기술 스택 조회
+            responses = techStackService.getAllTechStacksByProfileId(profileId);
+        }
 
         // 200 OK 상태 코드와 함께 응답
         return ResponseEntity
@@ -84,6 +98,73 @@ public class TechStackController {
     ) {
         // Service 호출하여 ID로 기술 스택 조회
         TechStackResponse response = techStackService.getTechStackByProfileIdAndId(profileId, id);
+
+        // 200 OK 상태 코드와 함께 응답
+        return ResponseEntity
+                .ok()
+                .body(ApiResponse.success(response));
+    }
+
+    // ==================== PAGING ====================
+
+    /**
+     * 프로필별 전체 기술 스택 페이징 조회
+     *
+     * @param page 페이지 번호 (0-based, 기본값: 0)
+     * @param size 페이지 크기 (기본값: 10, 최대값: 100)
+     * @return 페이징된 기술 스택
+     */
+    @GetMapping(params = {"page", "size"})
+    public ResponseEntity<ApiResponse<Page<TechStackResponse>>> getTechStacksWithPaging(
+            @PathVariable
+            Long profileId,
+            @RequestParam(required = false)
+            String category,
+            @RequestParam(required = false)
+            String proficiency,
+            @RequestParam(defaultValue = "0")
+            int page,
+            @RequestParam(defaultValue = "10")
+            int size
+    ) {
+        Page<TechStackResponse> response;
+
+        if ((category != null && !category.isBlank()) || (proficiency != null && !proficiency.isBlank())) {
+            // Service 호출하여 조건에 맞는 프로필별 기술 스택 페이징 조회
+            response = techStackService.searchTechStackWithPaging(profileId, category, proficiency, page, size);
+        } else {
+            // Service 호출하여 프로필별 전체 기술 스택 페이징 조회
+            response = techStackService.getTechStacksWithPaging(profileId, page, size);
+        }
+
+        // 200 OK 상태 코드와 함께 응답
+        return ResponseEntity
+                .ok()
+                .body(ApiResponse.success(response));
+    }
+
+    /**
+     * 프로필별 기술 카테고리로 기술 스택 페이징 조회
+     *
+     * @param category 기술 카테고리
+     * @param page 페이지 번호 (0-based, 기본값: 0)
+     * @param size 페이지 크기 (기본값: 10, 최대값: 100)
+     * @return 페이징된 기술 스택
+     */
+    @GetMapping(path = "/category/{category}", params = {"page", "size"})
+    public ResponseEntity<ApiResponse<Page<TechStackResponse>>> getTechStacksByCategoryWithPaging(
+            @PathVariable
+            Long profileId,
+            @PathVariable
+            String category,
+            @RequestParam(defaultValue = "0")
+            int page,
+            @RequestParam(defaultValue = "10")
+            int size
+    ) {
+        // Service 호출하여 직무별 프로필 페이징 조회
+        Page<TechStackResponse> response = techStackService.getTechStacksByCategoryWithPaging(
+                profileId, category, page, size);
 
         // 200 OK 상태 코드와 함께 응답
         return ResponseEntity

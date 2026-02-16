@@ -6,6 +6,7 @@ import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResp
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
+import com.study.profile_stack_api.global.common.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -54,11 +55,25 @@ public class ProfileController {
     /**
      * 모든 프로필 조회
      * GET /api/v1/profiles
+     * GET /api/v1/profiles?name={name}
+     * GET /api/v1/profiles?position={position}
      */
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ProfileResponse>>> getAllProfiles() {
-        // Service 호출하여 모든 프로필 조회
-        List<ProfileResponse> responses = profileService.getAllProfiles();
+    @GetMapping(params = {"!page", "!size"})
+    public ResponseEntity<ApiResponse<List<ProfileResponse>>> getAllProfiles(
+            @RequestParam(required = false)
+            String name,
+            @RequestParam(required = false)
+            String position
+    ) {
+        List<ProfileResponse> responses;
+
+        if ((name != null && !name.isBlank()) || (position != null && !position.isBlank())) {
+            // Service 호출하여 조건에 맞는 프로필 조회
+            responses = profileService.searchProfiles(name, position);
+        } else {
+            // Service 호출하여 모든 프로필 조회
+            responses = profileService.getAllProfiles();
+        }
 
         // 200 OK 상태 코드와 함께 응답
         return ResponseEntity
@@ -90,7 +105,7 @@ public class ProfileController {
      * 예시: GET /api/v1/profiles/position/BACKEND
      *       GET /api/v1/profiles/position/FRONTEND
      */
-    @GetMapping("/position/{position}")
+    @GetMapping(path = "/position/{position}", params = {"!page", "!size"})
     public ResponseEntity<ApiResponse<List<ProfileResponse>>> getProfileByPosition(
             @PathVariable
             String position
@@ -102,6 +117,68 @@ public class ProfileController {
         return ResponseEntity
                 .ok()
                 .body(ApiResponse.success(responses));
+    }
+
+    // ==================== PAGING ====================
+
+    /**
+     * 전체 프로필 페이징 조회
+     *
+     * @param page 페이지 번호 (0-based, 기본값: 0)
+     * @param size 페이지 크기 (기본값: 10, 최대값: 100)
+     * @return 페이징된 프로필
+     */
+    @GetMapping(params = {"page", "size"})
+    public ResponseEntity<ApiResponse<Page<ProfileResponse>>> getProfilesWithPaging(
+            @RequestParam(required = false)
+            String name,
+            @RequestParam(required = false)
+            String position,
+            @RequestParam(defaultValue = "0")
+            int page,
+            @RequestParam(defaultValue = "10")
+            int size
+    ) {
+        Page<ProfileResponse> response;
+
+        if ((name != null && !name.isBlank()) || (position != null && !position.isBlank())) {
+            // Service 호출하여 조건에 맞는 프로필 페이징 조회
+            response = profileService.searchProfilesWithPaging(name, position, page, size);
+        } else {
+            // Service 호출하여 전체 프로필 페이징 조회
+            response = profileService.getProfilesWithPaging(page, size);
+        }
+
+        // 200 OK 상태 코드와 함께 응답
+        return ResponseEntity
+                .ok()
+                .body(ApiResponse.success(response));
+    }
+
+    /**
+     * 직무별 프로필 페이징 조회
+     *
+     * @param position 직무
+     * @param page 페이지 번호 (0-based, 기본값: 0)
+     * @param size 페이지 크기 (기본값: 10, 최대값: 100)
+     * @return 페이징된 프로필
+     */
+    @GetMapping(path = "/position/{position}", params = {"page", "size"})
+    public ResponseEntity<ApiResponse<Page<ProfileResponse>>> getProfilesByPositionWithPaging(
+            @PathVariable
+            String position,
+            @RequestParam(defaultValue = "0")
+            int page,
+            @RequestParam(defaultValue = "10")
+            int size
+    ) {
+        // Service 호출하여 직무별 프로필 페이징 조회
+        Page<ProfileResponse> response = profileService.getProfilesByPositionWithPaging(position, page, size);
+
+        // 200 OK 상태 코드와 함께 응답
+        return ResponseEntity
+                .ok()
+                .body(ApiResponse.success(response));
     }
 
     // ==================== UPDATE ====================

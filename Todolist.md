@@ -17,8 +17,8 @@
 
 - [x]  Entity 클래스 작성 (Profile, Position Enum)
 - [x]  DTO 클래스 작성 (CreateRequest, UpdateRequest, Response)
-- [ ]  ProfileDao 인터페이스 정의
-- [ ]  ProfileDaoImpl 구현 (JdbcTemplate + RowMapper)
+- [x]  ProfileDao 인터페이스 정의
+- [x]  ProfileDaoImpl 구현 (JdbcTemplate + RowMapper)
 - [x]  ProfileRepository 구현
 - [x]  ProfileService 구현
 - [x]  ProfileController 구현
@@ -28,8 +28,8 @@
 
 - [x]  Entity 클래스 작성 (TechStack, TechCategory Enum, Proficiency Enum)
 - [x]  DTO 클래스 작성 (CreateRequest, UpdateRequest, Response)
-- [ ]  TechStackDao 인터페이스 정의
-- [ ]  TechStackDaoImpl 구현 (profileId를 활용한 쿼리 주의)
+- [x]  TechStackDao 인터페이스 정의
+- [x]  TechStackDaoImpl 구현 (profileId를 활용한 쿼리 주의)
 - [x]  TechStackRepository 구현
 - [x]  TechStackService 구현 (프로필 존재 여부 검증 포함)
 - [x]  TechStackController 구현

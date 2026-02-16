@@ -8,7 +8,7 @@
 ### Phase 2: 공통 모듈
 
 - [x]  ApiResponse 클래스 구현
-- [ ]  Page 제네릭 클래스 구현
+- [x]  Page 제네릭 클래스 구현
 - [x]  ErrorCode Enum 정의
 - [x]  BusinessException 및 하위 예외 클래스 구현
 - [x]  GlobalExceptionHandler 구현
@@ -37,10 +37,10 @@
 
 ### Phase 5: 페이징 & 검색
 
-- [ ]  프로필 목록 페이징 구현 (findAllWithPaging)
-- [ ]  프로필 검색 구현 (이름 검색, 직무 필터링)
-- [ ]  기술 스택 목록 페이징 구현 (findByProfileIdWithPaging)
-- [ ]  기술 스택 검색 구현 (카테고리, 숙련도 필터링)
+- [x]  프로필 목록 페이징 구현 (findAllWithPaging)
+- [x]  프로필 검색 구현 (이름 검색, 직무 필터링)
+- [x]  기술 스택 목록 페이징 구현 (findByProfileIdWithPaging)
+- [x]  기술 스택 검색 구현 (카테고리, 숙련도 필터링)
 
 ### Phase 6: 테스트 코드 (보너스)
 

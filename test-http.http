@@ -13,7 +13,7 @@ Content-Type: {{contentType}}
     "name": "김영규",
     "email": "java.gyu@example.com",
     "bio": "이직하고 싶어요",
-    "position": "BACKEND3",
+    "position": "BACKEND",
     "careerYears": 5,
     "githubUrl": "https://github.com/KimYoungQ",
     "blogUrl": "https://www.notion.so/YG-Dev-2e8eca6f192b802cbd82cada1ef2e823"
@@ -28,7 +28,20 @@ GET {{baseUrl}}/api/v1/profiles?page=0&size=10
 ###GET /api/v1/profiles?page=0&size=10&position=BACKEND
 
 ### 2-2 프로필 ID 조회
-GET {{baseUrl}}/api/v1/profiles/1
+GET {{baseUrl}}/api/v1/profiles/4
 
 ### 2-3 직무별 프로필 조회
 GET {{baseUrl}}/api/v1/profiles/position/BACKEND
+
+### ================================
+### 3. UPDATE - 프로필 수정
+### ================================
+
+### 3-1. 프로필 수정
+PUT {{baseUrl}}/api/v1/profiles/4
+Content-Type: {{contentType}}
+
+{
+    "bio": "Spring Boot와 JPA를 사랑하는 백엔드 개발자입니다. 최근 Kotlin에도 관심이 생겼습니다.",
+    "careerYears": 4
+}

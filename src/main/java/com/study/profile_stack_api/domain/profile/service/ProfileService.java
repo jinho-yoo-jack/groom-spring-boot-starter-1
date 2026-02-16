@@ -79,4 +79,21 @@ public class ProfileService {
                 .map(ProfileResponse::from)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 프로필 수정
+     * @param id
+     * @param profileRequest
+     * @return
+     */
+    public ProfileResponse updateProfile(long id, ProfileRequest profileRequest) {
+        Profile profile = profileDao.getProfile(id)
+                .orElseThrow(() -> new IllegalArgumentException("수정할 프로필이 없습니다. (id : " + id + ")"));
+
+        if (profileRequest.hasNoUpdates()) {
+            throw new IllegalArgumentException("수정할 내용이 없습니다.");
+        }
+
+        return ProfileResponse.from(profileDao.updateProfile(profile.update(profileRequest)));
+    }
 }

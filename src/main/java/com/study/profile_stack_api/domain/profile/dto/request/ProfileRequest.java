@@ -6,14 +6,23 @@ public class ProfileRequest {
     private String email;
     private String bio;
     private String position;
-    private int careerYears;
+    private Integer careerYears;
     private String githubUrl;
     private String blogUrl;
 
     public ProfileRequest() {}
 
-    // Getter
+    public boolean hasNoUpdates() {
+        return name == null
+                && email == null
+                && bio == null
+                && position == null
+                && careerYears == null
+                && githubUrl == null
+                && blogUrl == null;
+    }
 
+    // Getter
     public String getName() {
         return name;
     }

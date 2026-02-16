@@ -17,4 +17,7 @@ public interface ProfileDao {
     Optional<Profile> getProfile(long id);
 
     List<Profile> searchProfileByPosition(String position);
+
+    // ============ UPDATE ================
+    Profile updateProfile(Profile profile);
 }

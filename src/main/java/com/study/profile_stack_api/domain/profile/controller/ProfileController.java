@@ -69,4 +69,20 @@ public class ProfileController {
     public List<ProfileResponse> searchProfileByPosition(@PathVariable String position) {
         return profileService.searchProfileByPosition(position);
     }
+
+    // ================ UPDATE ==================
+
+    /**
+     * 프로필 수정
+     * @param id
+     * @param profileRequest
+     * @return
+     */
+    @PutMapping("/{id}")
+    public ProfileResponse updateProfileByPosition(
+            @PathVariable long id,
+            @RequestBody ProfileRequest profileRequest) {
+
+        return profileService.updateProfile(id, profileRequest);
+    }
 }

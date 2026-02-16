@@ -101,6 +101,32 @@ public class ProfileDaoImpl implements ProfileDao {
         return content;
     }
 
+    // ============== UPDATE =================
+    @Override
+    public Profile updateProfile(Profile profile) {
+        String sql = """
+                UPDATE profile
+                SET name = ?, email = ?, bio = ?, position = ?, career_years = ?, github_url = ?, blog_url = ?
+                WHERE id = ?
+                """;
+
+        int updated = jdbcTemplate.update(sql,
+                profile.getName(),
+                profile.getEmail(),
+                profile.getBio(),
+                profile.getPosition().name(),
+                profile.getCareerYears(),
+                profile.getGithubUrl(),
+                profile.getBlogUrl(),
+                profile.getId());
+
+        if (updated == 0) {
+            throw new RuntimeException("profile not found. ID: " + profile.getId());
+        }
+
+        return profile;
+    }
+
     // ===================================
     private final RowMapper<Profile> profileRowMapper = (rs, rowNum) -> {
         Profile profile = new Profile();

@@ -20,6 +20,8 @@ public class TechStack {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public TechStack() {}
+
     public TechStack(Long id, Long profileId, String name, TechCategory category, Proficiency proficiency, Integer yearsOfExp) {
         this.id = id;
         this.profileId = profileId;

@@ -20,7 +20,9 @@ public class Profile {
     private String githubUrl;
     private String blogUrl;
     private LocalDateTime createdAt;
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
+
+    public Profile() {}
 
     public Profile(Long id, String name, String email, String bio, Position position, Integer careerYears,
                    String githubUrl, String blogUrl) {
@@ -33,7 +35,7 @@ public class Profile {
         this.githubUrl = githubUrl;
         this.blogUrl = blogUrl;
         this.createdAt = LocalDateTime.now();
-        this.updateAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     /**

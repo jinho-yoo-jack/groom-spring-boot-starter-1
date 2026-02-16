@@ -1,12 +1,12 @@
 package com.study.profile_stack_api.domain.profile.service;
 
+import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
-import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
 import com.study.profile_stack_api.global.exception.DuplicateEmailException;
 import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import org.springframework.stereotype.Service;
@@ -21,14 +21,14 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ProfileService {
-    /** 의존성 주입: Repository */
-    private final ProfileRepository profileRepository;
+    /** 의존성 주입: DAO 인터페이스 */
+    private final ProfileDao profileDao;
 
     /**
      * 생성자 주입
      */
-    public ProfileService(ProfileRepository profileRepository) {
-        this.profileRepository = profileRepository;
+    public ProfileService(ProfileDao profileDao) {
+        this.profileDao = profileDao;
     }
 
     // ==================== CREATE ====================
@@ -55,7 +55,7 @@ public class ProfileService {
         );
 
         // 저장
-        Profile savedProfile = profileRepository.save(profile);
+        Profile savedProfile = profileDao.save(profile);
 
         // Entity -> Response DTO 변환 후 반환
         return ProfileResponse.from(savedProfile);
@@ -70,7 +70,7 @@ public class ProfileService {
      */
     public List<ProfileResponse> getAllProfiles() {
         // Repository에서 모든 프로필 조회
-        List<Profile> profiles = profileRepository.findAll();
+        List<Profile> profiles = profileDao.findAll();
 
         // Entity 리스트 -> Response DTO 리스트로 변환
         return profiles.stream()
@@ -86,7 +86,7 @@ public class ProfileService {
      */
     public ProfileResponse getProfileById(Long id) {
         // Repository에서 ID로 조회, 존재하지 않으면 예외 처리
-        Profile profile = profileRepository.findById(id)
+        Profile profile = profileDao.findById(id)
                 .orElseThrow(() -> new ProfileNotFoundException(id));
 
         // Entity -> Response DTO로 변환
@@ -111,7 +111,7 @@ public class ProfileService {
         }
 
         // Repository에서 직무로 조회
-        List<Profile> profiles = profileRepository.findByPosition(position);
+        List<Profile> profiles = profileDao.findByPosition(position);
 
         // Entity 리스트 -> Response DTO 리스트로 변환
         return profiles.stream()
@@ -126,7 +126,7 @@ public class ProfileService {
         Objects.requireNonNull(request);
 
         // 기존 프로필 조회
-        Profile profile = profileRepository.findById(id)
+        Profile profile = profileDao.findById(id)
                 .orElseThrow(() -> new ProfileNotFoundException(id));
 
         // 수정 내용 있는지 확인
@@ -159,7 +159,7 @@ public class ProfileService {
         );
 
         // 저장 및 응답 반환
-        Profile updatedProfile = profileRepository.update(profile);
+        Profile updatedProfile = profileDao.update(profile);
         return ProfileResponse.from(updatedProfile);
     }
 
@@ -173,12 +173,12 @@ public class ProfileService {
      */
     public ProfileDeleteResponse deleteProfile(Long id) {
         // ID에 따른 프로필이 있는지 확인
-        if (!profileRepository.existsById(id)) {
+        if (!profileDao.existsById(id)) {
             throw new ProfileNotFoundException(id);
         }
 
         // 삭제 수행
-        boolean isDeleted = profileRepository.deleteById(id);
+        boolean isDeleted = profileDao.deleteById(id);
 
         // 삭제 결과 반환
         return ProfileDeleteResponse.of(id, isDeleted);
@@ -191,7 +191,7 @@ public class ProfileService {
      */
     public Map<String, Object> deleteAllProfiles() {
         // 프로필 총 개수 확인
-        long deleteCount = profileRepository.deleteAll();
+        long deleteCount = profileDao.deleteAll();
 
         // 삭제 결과 반환
         return Map.of(
@@ -222,7 +222,7 @@ public class ProfileService {
             throw new IllegalArgumentException("이메일은 100자를 초과할 수 없습니다.");
         }
 
-        if (profileRepository.existsByEmail(request.getEmail())) {
+        if (profileDao.existsByEmail(request.getEmail())) {
             throw new DuplicateEmailException(request.getEmail());
         }
 
@@ -256,7 +256,7 @@ public class ProfileService {
             if (request.getEmail().length() > 100) {
                 throw new IllegalArgumentException("이메일은 100자를 초과할 수 없습니다.");
             }
-            if (profileRepository.existsByEmail(request.getEmail())) {
+            if (profileDao.existsByEmail(request.getEmail())) {
                 throw new DuplicateEmailException(request.getEmail());
             }
         }

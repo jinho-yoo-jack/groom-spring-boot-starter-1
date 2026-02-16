@@ -6,7 +6,7 @@ use profile_db;
 
 -- 테이블 삭제
 DROP TABLE IF EXISTS tech_stack;
-DROP TABLE IF EXISTS profile_db;
+DROP TABLE IF EXISTS profile;
 
 -- profile 테이블 생성
 CREATE TABLE IF NOT EXISTS profile

@@ -41,7 +41,7 @@ public class ProfileResponse {
         response.githubUrl = profile.getGithubUrl();
         response.blogUrl = profile.getBlogUrl();
         response.createdAt = profile.getCreatedAt();
-        response.updatedAt = profile.getUpdateAt();
+        response.updatedAt = profile.getUpdatedAt();
         return response;
     }
 }

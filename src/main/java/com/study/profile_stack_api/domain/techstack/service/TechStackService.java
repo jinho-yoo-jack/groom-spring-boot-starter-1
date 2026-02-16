@@ -1,7 +1,8 @@
 package com.study.profile_stack_api.domain.techstack.service;
 
+import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
-import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
+import com.study.profile_stack_api.domain.techstack.dao.TechStackDao;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackCreateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteResponse;
@@ -9,7 +10,6 @@ import com.study.profile_stack_api.domain.techstack.dto.response.TechStackRespon
 import com.study.profile_stack_api.domain.techstack.entity.Proficiency;
 import com.study.profile_stack_api.domain.techstack.entity.TechCategory;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
-import com.study.profile_stack_api.domain.techstack.repository.TechStackRepository;
 import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
 import org.springframework.stereotype.Service;
@@ -25,15 +25,15 @@ import java.util.stream.Collectors;
 @Service
 public class TechStackService {
     /** 의존성 주입: Repository */
-    private final TechStackRepository techStackRepository;
-    private final ProfileRepository profileRepository;
+    private final TechStackDao techStackDao;
+    private final ProfileDao profileDao;
 
     /**
      * 생성자 주입
      */
-    public TechStackService(TechStackRepository techStackRepository, ProfileRepository profileRepository) {
-        this.techStackRepository = techStackRepository;
-        this.profileRepository = profileRepository;
+    public TechStackService(TechStackDao techStackDao, ProfileDao profileDao) {
+        this.techStackDao = techStackDao;
+        this.profileDao = profileDao;
     }
 
     // ==================== CREATE ====================
@@ -63,7 +63,7 @@ public class TechStackService {
         );
 
         // 저장
-        TechStack savedTechStack = techStackRepository.saveByProfileId(techStack);
+        TechStack savedTechStack = techStackDao.saveByProfileId(profileId, techStack);
 
         // Entity -> Response DTO 변환 후 반환
         return TechStackResponse.from(savedTechStack);
@@ -82,7 +82,7 @@ public class TechStackService {
         validataProfileId(profileId);
 
         // Repository에서 profileId에 해당하는 기술 스택만 조회
-        List<TechStack> techStacks = techStackRepository.findAllByProfileId(profileId);
+        List<TechStack> techStacks = techStackDao.findAllByProfileId(profileId);
 
         // Entity 리스트 -> Response DTO 리스트로 변환
         return techStacks.stream()
@@ -102,7 +102,7 @@ public class TechStackService {
         validataProfileId(profileId);
 
         // Repository에서 profileId + id로 조회, 존재하지 않으면 예외 처리
-        TechStack techStack = techStackRepository.findByProfileIdAndId(profileId, id)
+        TechStack techStack = techStackDao.findByProfileIdAndId(profileId, id)
                 .orElseThrow(() -> new TechStackNotFoundException(id));
 
         // Entity -> Response DTO로 변환
@@ -128,7 +128,7 @@ public class TechStackService {
         validataProfileId(profileId);
 
         // 기존 기술 스택 조회
-        TechStack techStack = techStackRepository.findByProfileIdAndId(profileId, id)
+        TechStack techStack = techStackDao.findByProfileIdAndId(profileId, id)
                 .orElseThrow(() -> new TechStackNotFoundException(id));
 
         // 수정 내용 있는지 확인
@@ -167,7 +167,7 @@ public class TechStackService {
         );
 
         // 저장 및 응답 반환
-        TechStack updatedTechStack = techStackRepository.updateByProfileId(techStack);
+        TechStack updatedTechStack = techStackDao.updateByProfileId(profileId, techStack);
         return TechStackResponse.from(updatedTechStack);
     }
 
@@ -185,11 +185,11 @@ public class TechStackService {
         validataProfileId(profileId);
 
         // ProfileId + ID에 따른 기술 스택이 있는지 확인
-        techStackRepository.findByProfileIdAndId(profileId, id)
+        techStackDao.findByProfileIdAndId(profileId, id)
                 .orElseThrow(() -> new TechStackNotFoundException(id));
 
         // 삭제 수행
-        boolean isDeleted = techStackRepository.deleteByProfileIdAndId(profileId, id);
+        boolean isDeleted = techStackDao.deleteByProfileIdAndId(profileId, id);
 
         // 삭제 결과 반환
         return TechStackDeleteResponse.of(id, isDeleted);
@@ -206,7 +206,7 @@ public class TechStackService {
         validataProfileId(profileId);
 
         // 프로필 총 개수 확인
-        long deleteCount = techStackRepository.deleteAllByProfileId(profileId);
+        long deleteCount = techStackDao.deleteAllByProfileId(profileId);
 
         // 삭제 결과 반환
         return Map.of(
@@ -221,7 +221,7 @@ public class TechStackService {
      * 프로필과 기술 스택의 FK 검증
      */
     private Profile validataProfileId(Long profileId) {
-        return profileRepository.findById(profileId)
+        return profileDao.findById(profileId)
                 .orElseThrow(() -> new ProfileNotFoundException(profileId));
     }
 

@@ -46,7 +46,8 @@ GET {{baseUrl}}/api/v1/profiles/position/BACKEND
 
 ### 2-4 기술 스택 목록 조회 (Read - List, 페이징)
 GET {{baseUrl}}/api/v1/profiles/1/tech-stacks?page=0&size=10
-### GET /api/v1/profiles/1/tech-stacks?page=0&size=5&category=LANGUAGE
+###
+GET {{baseUrl}}/api/v1/profiles/1/tech-stacks?page=0&size=5&category=TOOL
 
 ### 2-5 기술 단건 조회
 GET {{baseUrl}}/api/v1/profiles/1/tech-stacks/4

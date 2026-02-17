@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,10 +56,24 @@ public class TechStatckDaoImpl implements TechStackDao {
     //============== READ ===================
 
     @Override
-    public Page<TechStack> getAllTechStacks(long profileId, int page, int size) {
+    public Page<TechStack> getAllTechStacks(long profileId, int page, int size, String category, String proficiency) {
+        List<Object> countParams = new ArrayList<>();
+        List<Object> dataParams = new ArrayList<>();
 
-        String countSql = "SELECT count(*) FROM tech_stack WHERE profile_id = ?";
-        Long totalElements = jdbcTemplate.queryForObject(countSql, Long.class, profileId);
+        String countSql = "SELECT count(*) FROM tech_stack WHERE 1=1 AND profile_id = ?";
+        countParams.add(profileId);
+
+        if (category != null) {
+            countSql += " AND category = ?";
+            countParams.add(category);
+        }
+
+        if (proficiency != null) {
+            countSql += " AND proficiency LIKE ?";
+            countParams.add("%" + proficiency + "%");
+        }
+
+        Long totalElements = jdbcTemplate.queryForObject(countSql, Long.class, countParams.toArray());
 
         // 전체 데이터가 0건이면 빈 페이지 반환
         if (totalElements == null || totalElements == 0) {
@@ -68,12 +83,25 @@ public class TechStatckDaoImpl implements TechStackDao {
         String datasql = """
                 SELECT * FROM tech_stack
                 WHERE profile_id = ?
-                ORDER BY id DESC
-                LIMIT ? OFFSET ?
                 """;
+        dataParams.add(profileId);
+
+        if (category != null) {
+            datasql += " AND category = ?";
+            dataParams.add(category);
+        }
+
+        if (proficiency != null) {
+            datasql += " AND proficiency = ?";
+            dataParams.add(proficiency);
+        }
+
+        datasql += " ORDER BY id DESC LIMIT ? OFFSET ?";
 
         int offset = page * size;
-        List<TechStack> content = jdbcTemplate.query(datasql, techStackRowMapper, profileId, size, offset);
+        dataParams.add(size);
+        dataParams.add(offset);
+        List<TechStack> content = jdbcTemplate.query(datasql, techStackRowMapper, dataParams.toArray());
 
         return new Page<>(content, page, size, totalElements);
     }

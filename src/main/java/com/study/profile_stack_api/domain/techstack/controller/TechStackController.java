@@ -42,9 +42,11 @@ public class TechStackController {
     public Page<TechStackResponse> getAllTechStacks(
             @PathVariable long profileId,
             @RequestParam(defaultValue = "0") int size,
-            @RequestParam(defaultValue = "10") int page) {
+            @RequestParam(defaultValue = "10") int page,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String proficiency) {
 
-        return techStackService.getAllTechStack(profileId, size, page);
+        return techStackService.getAllTechStack(profileId, size, page, category, proficiency);
     }
 
     /**

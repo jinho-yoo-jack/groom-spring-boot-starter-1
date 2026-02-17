@@ -46,12 +46,15 @@ public class TechStackService {
 
     /**
      * 기술 스택 목록 조회
+     *
      * @param profileId
      * @param size
      * @param page
+     * @param category
+     * @param proficiency
      * @return
      */
-    public Page<TechStackResponse> getAllTechStack(long profileId, int size, int page) {
+    public Page<TechStackResponse> getAllTechStack(long profileId, int size, int page, String category, String proficiency) {
 
         profileDao.getProfile(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. (id : " + profileId + ")"));
@@ -59,7 +62,7 @@ public class TechStackService {
         page = Math.max(0, page);
         size = Math.min(size, MAX_PAGE_SIZE);
 
-        Page<TechStack> techStackPage = techstackDao.getAllTechStacks(profileId, page, size);
+        Page<TechStack> techStackPage = techstackDao.getAllTechStacks(profileId, page, size, category, proficiency);
 
         List<TechStackResponse> content = techStackPage.getContent().stream()
                                             .map(TechStackResponse::from)

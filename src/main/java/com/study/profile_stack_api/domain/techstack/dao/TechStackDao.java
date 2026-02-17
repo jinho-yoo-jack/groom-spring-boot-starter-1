@@ -11,7 +11,7 @@ public interface TechStackDao {
     TechStack save(TechStack stack);
 
     //========== READ ==============
-    Page<TechStack> getAllTechStacks(long profileId, int page, int size);
+    Page<TechStack> getAllTechStacks(long profileId, int page, int size, String category, String proficiency);
 
     Optional<TechStack> getTechStack(long id);
 

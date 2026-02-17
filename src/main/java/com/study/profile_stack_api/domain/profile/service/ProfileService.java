@@ -40,12 +40,12 @@ public class ProfileService {
      * @param size
      * @return
      */
-    public Page<ProfileResponse> getAllProfiles(int page, int size) {
+    public Page<ProfileResponse> getAllProfiles(int page, int size, String position, String name) {
 
         page = Math.max(0, page);
         size = Math.min(size, MAX_PAGE_SIZE);
 
-        Page<Profile> profilePage = profileDao.getAllProfiles(page, size);
+        Page<Profile> profilePage = profileDao.getAllProfiles(page, size, position, name);
 
         List<ProfileResponse> content = profilePage.getContent().stream()
                 .map(ProfileResponse::from)

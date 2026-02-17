@@ -35,7 +35,8 @@ Content-Type: {{contentType}}
 
 ### 2-1 프로필 목록 조회 (Read - List, 페이징)
 GET {{baseUrl}}/api/v1/profiles?page=0&size=10
-###GET /api/v1/profiles?page=0&size=10&position=BACKEND
+###
+GET {{baseUrl}}/api/v1/profiles?page=0&size=10&position=FRONTEND&name=이리
 
 ### 2-2 프로필 ID 조회
 GET {{baseUrl}}/api/v1/profiles/3

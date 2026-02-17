@@ -47,7 +47,7 @@ public class ProfileController {
             @RequestParam(required = false) String position,
             @RequestParam(required = false) String name) {
 
-        return profileService.getAllProfiles(page, size);
+        return profileService.getAllProfiles(page, size, position, name);
     }
 
     /**

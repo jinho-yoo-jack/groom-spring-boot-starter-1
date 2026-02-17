@@ -12,7 +12,7 @@ public interface ProfileDao {
     Profile save(Profile profile);
 
     // ============ READ ================
-    Page<Profile> getAllProfiles(int page, int size);
+    Page<Profile> getAllProfiles(int page, int size, String position, String name);
 
     Optional<Profile> getProfile(long id);
 

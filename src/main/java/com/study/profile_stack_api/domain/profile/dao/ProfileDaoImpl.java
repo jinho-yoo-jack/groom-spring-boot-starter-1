@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,10 +58,24 @@ public class ProfileDaoImpl implements ProfileDao {
     // ============== READ =================
 
     @Override
-    public Page<Profile> getAllProfiles(int page, int size) {
+    public Page<Profile> getAllProfiles(int page, int size, String position, String name) {
+        List<Object> countParams = new ArrayList<>();
+        List<Object> dataParams = new ArrayList<>();
 
-        String countSql = "SELECT count(*) FROM profile";
-        Long totalElements = jdbcTemplate.queryForObject(countSql, Long.class);
+        String countSql = "SELECT count(*) FROM profile WHERE 1=1";
+
+        if (position != null) {
+            countSql += " AND position = ?";
+            countParams.add(position);
+        }
+
+        if (name != null) {
+            countSql += " AND name LIKE ?";
+            countParams.add("%" + name + "%");
+        }
+
+        Long totalElements = jdbcTemplate.queryForObject(countSql, Long.class, countParams.toArray());
+
 
         // 전체 데이터가 0건이면 빈 페이지 반환
         if (totalElements == null || totalElements == 0) {
@@ -69,12 +84,25 @@ public class ProfileDaoImpl implements ProfileDao {
 
         String datasql = """
                 SELECT * FROM profile 
-                ORDER BY id DESC
-                LIMIT ? OFFSET ?
+                WHERE 1=1
                 """;
 
+        if (position != null) {
+            datasql += " AND position = ?";
+            dataParams.add(position);
+        }
+
+        if (name != null) {
+            datasql += " AND name LIKE ?";
+            dataParams.add("%" + name + "%");
+        }
+
+        datasql += " ORDER BY id DESC LIMIT ? OFFSET ?";
+
         int offset = page * size;
-        List<Profile> content = jdbcTemplate.query(datasql, profileRowMapper, size, offset);
+        dataParams.add(size);
+        dataParams.add(offset);
+        List<Profile> content = jdbcTemplate.query(datasql, profileRowMapper, dataParams.toArray());
 
         return new Page<>(content, page, size, totalElements);
     }

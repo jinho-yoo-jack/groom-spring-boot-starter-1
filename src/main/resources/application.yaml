@@ -1,42 +1,23 @@
 # 서버 설정
 server:
-  # 포트 번호
   port: 8080
   servlet:
-    # 기본 경로 localhost:8080/
     context-path: /
 
-# Spring 설정
 spring:
   application:
     name: dev-info
 
-  # MySQL 데이터베이스 설정
-  datasource:
-    url: jdbc:mysql://localhost:3306/dev_info_diary?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 600000
-      pool-name: StudyDiaryHikariCP
+  profiles:
+    active: dev
 
-  # SQL 로깅 설정
-  sql:
-    init:
-      mode: always
-      platform: mysql
-      encoding: UTF-8
   servlet:
     encoding:
       charset: UTF-8
       enabled: true
       force: true
 
-# 로깅 설정
+# 로깅 설정(공통)
 logging:
   level:
     root: INFO

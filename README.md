@@ -205,10 +205,10 @@ curl -X POST http://localhost:8080/api/v1/profiles/1/tech-stacks \
 ## 구현 체크리스트
 
 ### Phase 1: 기본 설정
-- [ ] Spring Boot 프로젝트 설정
-- [ ] application.yml 작성
-- [ ] schema.sql, data.sql 작성
-- [ ] H2 Console 연결 확인
+- [x] Spring Boot 프로젝트 설정
+- [x] application.yml 작성
+- [x] schema.sql, data.sql 작성
+- [x] H2 Console 연결 확인
 
 ### Phase 2: 공통 모듈
 - [ ] ApiResponse 클래스 구현

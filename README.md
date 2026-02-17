@@ -211,7 +211,7 @@ curl -X POST http://localhost:8080/api/v1/profiles/1/tech-stacks \
 - [x] H2 Console 연결 확인
 
 ### Phase 2: 공통 모듈
-- [ ] ApiResponse 클래스 구현
+- [x] ApiResponse 클래스 구현
 - [ ] Page 클래스 구현
 - [ ] BusinessException 및 하위 예외 클래스 구현
 - [ ] GlobalExceptionHandler 구현

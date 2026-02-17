@@ -12,7 +12,7 @@ public class Profile {
     private String email;               // 필수값
     private String bio;                 // null 허용
     private Position position;          // 필수값
-    private int careerYears;            // 필수값
+    private Integer careerYears;            // 필수값
     private String githubUrl;           // null 허용
     private String blogUrl;             // null 허용
     private LocalDateTime createdAt;
@@ -28,7 +28,7 @@ public class Profile {
                             }
                             this.setName(name);
                         }, () -> {
-                            throw new IllegalArgumentException("이름은 필수입니다.");
+                            throw new IllegalArgumentException("이름은 필수입니33다.");
                         }
                 );
         Optional.ofNullable(profileRequest.getEmail())
@@ -56,10 +56,12 @@ public class Profile {
         Optional.ofNullable(profileRequest.getCareerYears())
                 .ifPresentOrElse(careerYears -> {
                             if (careerYears < 0) {
-                                throw new IllegalArgumentException("경력연차는 0이상이여야 합니다.");
+                                throw new IllegalArgumentException("경력 연차는 0이상이여야 합니다.");
                             }
                             this.setCareerYears(careerYears);
-                        }, () -> this.setCareerYears(0)
+                        }, () -> {
+                            throw new IllegalArgumentException("경력 연차는 필수입니다.");
+                        }
                 );
         Optional.ofNullable(profileRequest.getGithubUrl())
                 .ifPresent( githubUrl -> {
@@ -155,7 +157,7 @@ public class Profile {
         return position;
     }
 
-    public int getCareerYears() {
+    public Integer getCareerYears() {
         return careerYears;
     }
 
@@ -197,7 +199,7 @@ public class Profile {
         this.position = position;
     }
 
-    public void setCareerYears(int careerYears) {
+    public void setCareerYears(Integer careerYears) {
         this.careerYears = careerYears;
     }
 

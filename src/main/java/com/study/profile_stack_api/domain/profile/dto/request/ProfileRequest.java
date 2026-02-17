@@ -39,7 +39,7 @@ public class ProfileRequest {
         return position;
     }
 
-    public int getCareerYears() {
+    public Integer getCareerYears() {
         return careerYears;
     }
 

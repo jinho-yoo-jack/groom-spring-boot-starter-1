@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.profile.controller;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
+import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
@@ -54,7 +55,8 @@ public class ProfileController {
 
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteProfile(@PathVariable String id) {
-        return ResponseEntity.ok().body(ApiResponse.success("deleteProfile | id: %s".formatted(id)));
+    public ResponseEntity<ApiResponse<ProfileDeleteResponse>> deleteProfile(@PathVariable Long id) {
+        ProfileDeleteResponse response = profileService.deleteProfileById(id);
+        return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 }

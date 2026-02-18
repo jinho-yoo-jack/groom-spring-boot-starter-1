@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.profile.service;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
+import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
@@ -53,7 +54,7 @@ public class ProfileService {
             throw new ApiException(ErrorCode.INVALID_INPUT, "잘못된 id 값입니다.");
         }
         Optional<Profile> result = repository.findById(id);
-        Profile profile = result.orElseThrow(() -> new RuntimeException("Profile not found"));
+        Profile profile = result.orElseThrow(() -> new ApiException(ErrorCode.PROFILE_NOT_FOUND));
         return ProfileResponse.from(profile);
     }
 
@@ -73,11 +74,11 @@ public class ProfileService {
             throw new ApiException(ErrorCode.INVALID_INPUT, "수정할 항목이 없습니다.");
         }
 
-        // 2. 기존 프로필 조회
-        Profile profile = repository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.PROFILE_NOT_FOUND));
-
-        // 3. 수정할 값들의 유효성 검증
+        // 2. 수정할 값들의 유효성 검증
         validateUpdateProfile(request);
+
+        // 3. 기존 프로필 조회
+        Profile profile = repository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.PROFILE_NOT_FOUND));
 
         // 4. 포지션 수정 있다면 변경
         Position position = null;
@@ -94,6 +95,16 @@ public class ProfileService {
     }
 
     // === Delete ===
+    public ProfileDeleteResponse deleteProfileById(Long id) {
+        // 1. 프로필 존재 확인
+        repository.findById(id).orElseThrow(() -> new ApiException(ErrorCode.PROFILE_NOT_FOUND));
+
+        // 2. 삭제 수행
+        repository.deleteById(id);
+
+        // 3. 삭제 결과 반환
+        return ProfileDeleteResponse.of(id);
+    }
 
     // ===============================================
 

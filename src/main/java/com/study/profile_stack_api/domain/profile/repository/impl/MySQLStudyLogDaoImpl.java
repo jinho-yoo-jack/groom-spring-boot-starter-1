@@ -127,7 +127,12 @@ public class MySQLStudyLogDaoImpl implements ProfileDao {
     // === Delete ===
     @Override
     public boolean deleteById(Long id) {
-        return false;
+        String sql = "delete from profile where id = ?";
+        int updated = jdbcTemplate.update(sql, id);
+        if (updated == 0) {
+            throw new ApiException(ErrorCode.PROFILE_NOT_FOUND);
+        }
+        return true;
     }
 
 

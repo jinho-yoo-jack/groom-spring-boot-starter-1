@@ -1,8 +1,8 @@
 package com.study.profile_stack_api.domain.profile.controller;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
-import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
 import com.study.profile_stack_api.global.common.Page;
@@ -47,8 +47,9 @@ public class ProfileController {
 
     // PUT
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> updateProfile(@PathVariable String id) {
-        return ResponseEntity.ok().body(ApiResponse.success("updateProfile | id: %s".formatted(id)));
+    public ResponseEntity<ApiResponse<ProfileResponse>> updateProfile(@PathVariable Long id,  @RequestBody ProfileUpdateRequest request) {
+        ProfileResponse response = profileService.updateProfileById(id, request);
+        return ResponseEntity.ok().body(ApiResponse.success(response));
     }
 
     // DELETE

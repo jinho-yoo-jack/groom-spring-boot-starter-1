@@ -19,7 +19,7 @@ public interface ProfileDao {
     List<Profile> findByPosition(String position);              // 포지션으로 조회
 
     // === Update ===
-    Optional<Profile> update(Profile profile);                  // 프로필 수정
+    Profile update(Profile profile);                  // 프로필 수정
 
     // === Delete ===
     boolean deleteById(Long id);                                // 프로필 삭제

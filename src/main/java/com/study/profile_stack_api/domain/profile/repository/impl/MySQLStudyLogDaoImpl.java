@@ -5,6 +5,8 @@ import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.repository.dao.ProfileDao;
 import com.study.profile_stack_api.global.common.Page;
+import com.study.profile_stack_api.global.exception.ApiException;
+import com.study.profile_stack_api.global.exception.ErrorCode;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -97,8 +99,28 @@ public class MySQLStudyLogDaoImpl implements ProfileDao {
 
     // === Update ===
     @Override
-    public Optional<Profile> update(Profile profile) {
-        return Optional.empty();
+    public Profile update(Profile profile) {
+        String sql = """
+                update profile
+                set name = ?, email = ?, bio = ?, position = ?, career_years = ?, github_url = ?, blog_url = ?
+                where id = ?
+                """;
+
+        int updated = jdbcTemplate.update(sql,
+                profile.getName(),
+                profile.getEmail(),
+                profile.getBio(),
+                profile.getPosition().name(),
+                profile.getCareerYears(),
+                profile.getGithubUrl(),
+                profile.getBlogUrl(),
+                profile.getId());
+
+        if (updated == 0) {
+            throw new ApiException(ErrorCode.PROFILE_NOT_FOUND);
+        }
+
+        return profile;
     }
 
 

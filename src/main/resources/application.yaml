@@ -1,3 +1,37 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
 spring:
   application:
     name: my-spring-study-diary
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/starter_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: rootpass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      pool-name: StudyDiaryHikariCP
+
+  sql:
+    init:
+      mode: always
+      platform: mysql
+      encoding: UTF-8
+
+logging:
+  level:
+    root: INFO
+    com.study.my_spring_study_diary: DEBUG
+    org.springframework.jdbc: DEBUG
+    com.zaxxer.hikari: DEBUG

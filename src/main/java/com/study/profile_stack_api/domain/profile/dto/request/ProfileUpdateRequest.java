@@ -1,4 +1,6 @@
 package com.study.profile_stack_api.domain.profile.dto.request;
+import com.study.profile_stack_api.domain.profile.entity.Position;
+
 import java.time.LocalDateTime;
 
 public record ProfileUpdateRequest(
@@ -7,7 +9,6 @@ public record ProfileUpdateRequest(
         String email,
         String bio,
         String position,
-        String positionIcon,
         Integer careerYears,
         String githubUrl,
         String blogUrl,
@@ -23,7 +24,6 @@ public record ProfileUpdateRequest(
                 && email == null
                 && bio == null
                 && position == null
-                && positionIcon == null
                 && careerYears == null
                 && githubUrl == null
                 && blogUrl == null;

@@ -5,9 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ProfileStackApiApplication {
-
 	public static void main(String[] args) {
-		SpringApplication.run(ProfileStackApiApplication.class, args);
+SpringApplication.run(ProfileStackApiApplication.class, args);
 	}
-
 }

@@ -4,11 +4,14 @@ import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
+import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 
 import com.study.profile_stack_api.global.common.Page;
+import com.study.profile_stack_api.global.exception.DuplicateEmailException;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,17 +34,17 @@ public class ProfileService {
     public ProfileResponse createProfile(ProfileCreateRequest request) {
         //유효성 검증
         validateCreateRequest(request);
-        // email 중복 체크
-        if(profileDao.existByEmail(request.email())){
-            throw new IllegalStateException("DUPLIATE_EMAIL : 이미 사용중인 이메일입니다.");
-        }
+
+
+        //position 업데이트
+        Position  positon = validatePositionStr(request.position());
 
         // DTO -> entity 변환
         Profile profile = new Profile(
                 null, request.name(),
                 request.email(),
                 request.bio(),
-                request.position(),
+                positon,
                 request.careerYears(),
                 request.githubUrl(),
                 request.blogUrl(),
@@ -104,12 +107,14 @@ public class ProfileService {
 
         //2. 수정할 내용이 있는지 확인
         if(request.hasNoUpdates()){
-            throw new IllegalArgumentException("수정할 내용이 없습니다.");
+            throw new IllegalArgumentException("수정한 내용이 없습니다.");
         }
 
         //3. 수정할 값 들의 유효성 검증
         validateUpdateRequest(request);
 
+        //position 업데이트
+        Position  positon = validatePositionStr(request.position());
 
         //Entity 업데이트
         Profile updatedProfile = new Profile(
@@ -117,7 +122,7 @@ public class ProfileService {
                 request.name(),
                 request.email(),
                 request.bio(),
-                request.position(),
+                positon,
                 request.careerYears(),
                 request.githubUrl(),
                 request.blogUrl(),
@@ -145,47 +150,50 @@ public class ProfileService {
      * 생성 요청 유효성 검증
      */
     private void validateCreateRequest(ProfileCreateRequest request) {
-        if (request.name() == null || request.name().trim().isBlank()) {
-            throw new IllegalArgumentException("이름은 빈 값일 수 없습니다.");
-        }
-        if (request.name().length() > 50) {
-            throw new IllegalArgumentException("이름은 50자를 초과할 수 없습니다.");
-        }
 
-        if (request.email() == null || request.email().trim().isBlank()) {
-            throw new IllegalArgumentException("e-mail은 빈 값일 수 없습니다.");
-        }
-        if (request.email().length() > 100) {
-            throw new IllegalArgumentException("e-mail은 100자를 초과할 수 없습니다.");
-        }
-
-
-        if (request.position() == null || request.position().trim().isBlank()) {
-            throw new IllegalArgumentException("직무는 빈 값일 수 없습니다.");
-        }
-        if (request.position().length() > 20) {
-            throw new IllegalArgumentException("직무는 20자를 초과할 수 없습니다.");
-
-        }
-
-        if (request.careerYears() != null) {
-            if (request.careerYears() < 0) {
-                throw new IllegalArgumentException("경력/연차는 0 이상이어야 합니다.");
-            }
-        } else {
-            throw new IllegalArgumentException("경력/연차는 빈 값일 수 없습니다.");
-        }
-
-        if (request.bio() != null && request.bio().trim().length() > 500) {
-            throw new IllegalArgumentException("자기소개는 500자를 초과할 수 없습니다.");
-        }
-        if (request.githubUrl() != null && request.githubUrl().trim().length() > 200) {
-            throw new IllegalArgumentException("git URL은 200자를 초과할 수 없습니다.");
-        }
-        if (request.blogUrl() != null && request.blogUrl().trim().length() > 200) {
-            throw new IllegalArgumentException("Blog URL은 200자를 초과할 수 없습니다.");
-        }
+    // email 중복 체크
+    if (profileDao.existByEmail(request.email())) {
+        throw new DuplicateEmailException(request.email());
     }
+
+    if (request.name() == null || request.name().trim().isBlank()) {
+        throw new IllegalArgumentException("이름은 빈 값일 수 없습니다.");
+    }
+    if (request.name().length() > 50) {
+        throw new IllegalArgumentException("이름은 50자를 초과할 수 없습니다.");
+    }
+
+    if (request.email() == null || request.email().trim().isBlank()) {
+        throw new IllegalArgumentException("e-mail은 빈 값일 수 없습니다.");
+    }
+    if (request.email().length() > 100) {
+        throw new IllegalArgumentException("e-mail은 100자를 초과할 수 없습니다.");
+    }
+
+
+    if (request.position() == null) {
+        throw new IllegalArgumentException("직무는 빈 값일 수 없습니다.");
+    }
+
+    if (request.careerYears() != null) {
+        if (request.careerYears() < 0) {
+            throw new IllegalArgumentException("경력/연차는 0 이상이어야 합니다.");
+        }
+    } else {
+        throw new IllegalArgumentException("경력/연차는 빈 값일 수 없습니다.");
+    }
+
+    if (request.bio() != null && request.bio().trim().length() > 500) {
+        throw new IllegalArgumentException("자기소개는 500자를 초과할 수 없습니다.");
+    }
+    if (request.githubUrl() != null && request.githubUrl().trim().length() > 200) {
+        throw new IllegalArgumentException("git URL은 200자를 초과할 수 없습니다.");
+    }
+    if (request.blogUrl() != null && request.blogUrl().trim().length() > 200) {
+        throw new IllegalArgumentException("Blog URL은 200자를 초과할 수 없습니다.");
+    }
+
+}
 
     /**
      * 수정 요청 유효성 검증
@@ -211,19 +219,11 @@ public class ProfileService {
 
             // 만약 email을 바꾸겠다고 하면 ?
             if (profileDao.existByEmail(request.email())){
-                throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
+                throw new DuplicateEmailException(request.email());
 
             }
         }
 
-        if (request.position() != null) {
-            if (request.position().trim().isBlank()) {
-                throw new IllegalArgumentException("직무는 빈 값일 수 없습니다.");
-            }
-            if (request.position().length() > 20) {
-                throw new IllegalArgumentException("직무는 20자를 초과할 수 없습니다.");
-            }
-        }
 
         if (request.careerYears() != null) {
             if (request.careerYears() < 0) {
@@ -244,5 +244,13 @@ public class ProfileService {
         }
     }
 
+    public Position validatePositionStr(String position){
+        String upperPos = position.toUpperCase().trim();
 
+        try {
+            return Position.valueOf(upperPos);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("지원하지 않는 포지션 입니다. position : " + upperPos);
+        }
+    }
 }

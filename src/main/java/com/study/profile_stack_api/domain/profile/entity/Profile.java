@@ -16,7 +16,7 @@ public class Profile {
     private String name;
     private String email;
     private String bio;
-    private String position;
+    private Position position;
     private Integer careerYears;
     private String githubUrl;
     private String blogUrl;

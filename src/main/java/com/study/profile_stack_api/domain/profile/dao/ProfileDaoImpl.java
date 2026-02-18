@@ -1,5 +1,6 @@
 package com.study.profile_stack_api.domain.profile.dao;
 
+import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.global.common.Page;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,7 +37,7 @@ public class ProfileDaoImpl implements ProfileDao {
             ps.setString(1, profile.getName());
             ps.setString(2, profile.getEmail());
             ps.setString(3, profile.getBio());
-            ps.setString(4, profile.getPosition());
+            ps.setString(4, profile.getPosition().name());
             ps.setInt(5, profile.getCareerYears());
             ps.setString(6, profile.getGithubUrl());
             ps.setString(7, profile.getBlogUrl());
@@ -95,7 +96,7 @@ public class ProfileDaoImpl implements ProfileDao {
         profile.getName(),
         profile.getEmail(),
         profile.getBio(),
-        profile.getPosition(),
+        profile.getPosition().name().toUpperCase(),
         profile.getCareerYears(),
         profile.getGithubUrl(),
         profile.getBlogUrl(),
@@ -153,7 +154,7 @@ public class ProfileDaoImpl implements ProfileDao {
       profile.setName(rs.getString("name"));
       profile.setEmail(rs.getString("email"));
       profile.setBio(rs.getString("bio"));
-      profile.setPosition(rs.getString("position"));
+      profile.setPosition(Position.valueOf(rs.getString("position")));
       profile.setCareerYears(rs.getInt("career_years"));
       profile.setGithubUrl(rs.getString("github_url"));
       profile.setBlogUrl(rs.getString("blog_url"));

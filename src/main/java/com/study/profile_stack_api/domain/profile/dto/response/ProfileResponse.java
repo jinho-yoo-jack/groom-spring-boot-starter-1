@@ -1,5 +1,6 @@
 package com.study.profile_stack_api.domain.profile.dto.response;
 
+import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,8 @@ public class ProfileResponse {
     private String name;
     private String email;
     private String bio;
-    private String position;
+    private Position position;
+    private String positionIcon;
     private Integer careerYears;
     private String githubUrl;
     private String blogUrl;
@@ -27,6 +29,7 @@ public class ProfileResponse {
         response.email = profile.getEmail();
         response.bio = profile.getBio();
         response.position = profile.getPosition();
+        response.positionIcon = profile.getPosition().getIcon();
         response.careerYears = profile.getCareerYears();
         response.githubUrl = profile.getGithubUrl();
         response.blogUrl = profile.getBlogUrl();
@@ -54,9 +57,11 @@ public class ProfileResponse {
         return bio;
     }
 
-    public String getPosition() {
+    public Position getPosition() {
         return position;
     }
+
+    public String getPositionIcon() {return positionIcon;}
 
     public Integer getCareerYears() {
         return careerYears;
@@ -77,4 +82,5 @@ public class ProfileResponse {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
 }

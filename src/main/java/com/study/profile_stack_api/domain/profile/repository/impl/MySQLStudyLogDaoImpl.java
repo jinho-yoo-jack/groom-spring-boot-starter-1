@@ -3,16 +3,16 @@ package com.study.profile_stack_api.domain.profile.repository.impl;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.repository.dao.ProfileDao;
+import com.study.profile_stack_api.global.common.Page;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,31 +57,30 @@ public class MySQLStudyLogDaoImpl implements ProfileDao {
     public Optional<Profile> findById(Long id) {
         String sql = "SELECT * FROM profile WHERE id = ?";
         try {
-            Profile profile = jdbcTemplate.queryForObject(sql, (row, index) -> {
-                Profile item = new Profile();
-                item.setId(row.getLong("id"));
-                item.setName(row.getString("name"));
-                item.setEmail(row.getString("email"));
-                item.setBio(row.getString("bio"));
-                String position = row.getString("position");
-                item.setPosition(Position.valueOf(position));
-                item.setCareerYears(row.getInt("career_years"));
-                item.setGithubUrl(row.getString("github_url"));
-                item.setBlogUrl(row.getString("blog_url"));
-                item.setCreatedAt(row.getTimestamp("created_at").toLocalDateTime());
-                item.setUpdatedAt(row.getTimestamp("updated_at").toLocalDateTime());
-                return item;
-            }, id);
+            Profile profile = jdbcTemplate.queryForObject(sql, profileRowMapper, id);
             return Optional.ofNullable(profile);
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    @Override
-    public List<Profile> findWithPage(int offset, int limit) {
-        return List.of();
+    public Page<Profile> findWithPage(int page, int size) {
+        long totalElements = count();
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        int offset = page * size;
+
+        String sql = "select * from profile limit ? offset ?";
+        List<Profile> content = jdbcTemplate.query(sql, profileRowMapper, size, offset);
+
+        boolean first = (page == 0);
+        boolean last = (page >= totalPages - 1);     // totalPages=0이면 last 처리 주의
+        boolean hasPrevious = (page > 0 && page <= totalPages);
+        boolean hasNext = (page + 1 < totalPages);
+
+        return new Page<>(content, page, size, totalElements, totalPages, first, last, hasPrevious, hasNext);
     }
+
 
     @Override
     public List<Profile> findByPosition(String position) {
@@ -106,7 +105,9 @@ public class MySQLStudyLogDaoImpl implements ProfileDao {
     // === Utils ===
     @Override
     public long count() {
-        return 0;
+        String sql = "select count(*) from profile";
+        Long count = jdbcTemplate.queryForObject(sql, Long.class);
+        return count == null ? 0 : count;
     }
 
     @Override
@@ -119,4 +120,21 @@ public class MySQLStudyLogDaoImpl implements ProfileDao {
         String sql = "select count(*) from profile where email = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
         return count != null && count > 0;}
+
+
+    // === RowMapper ===
+    private final RowMapper<Profile> profileRowMapper = (row, index) -> {
+        Profile profile = new Profile();
+        profile.setId(row.getLong("id"));
+        profile.setName(row.getString("name"));
+        profile.setEmail(row.getString("email"));
+        profile.setBio(row.getString("bio"));
+        profile.setPosition(Position.valueOf(row.getString("position")));
+        profile.setCareerYears(row.getInt("career_years"));
+        profile.setGithubUrl(row.getString("github_url"));
+        profile.setBlogUrl(row.getString("blog_url"));
+        profile.setCreatedAt(row.getTimestamp("created_at").toLocalDateTime());
+        profile.setUpdatedAt(row.getTimestamp("updated_at").toLocalDateTime());
+        return profile;
+    };
 }

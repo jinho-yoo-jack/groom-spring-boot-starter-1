@@ -2,11 +2,15 @@ package com.study.profile_stack_api.domain.profile.controller;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
+import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
+import com.study.profile_stack_api.global.common.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/profiles")
@@ -27,8 +31,11 @@ public class ProfileController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<String>> getAllProfiles() {
-        return ResponseEntity.ok().body(ApiResponse.success("getAllProfiles"));
+    public ResponseEntity<ApiResponse<Page<Profile>>> getProfilesWithPaging(@RequestParam Integer page, @RequestParam Integer size) {
+        // service를 호출해서 page, size값을 전달하여 데이터 가져오기
+        Page<Profile> responses = profileService.getProfileWithPaging(page, size);
+        System.out.println(responses);
+        return ResponseEntity.ok().body(ApiResponse.success(responses));
     }
 
     // POST

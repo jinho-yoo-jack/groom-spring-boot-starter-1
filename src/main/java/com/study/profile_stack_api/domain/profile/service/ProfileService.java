@@ -5,11 +5,13 @@ import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.repository.dao.ProfileDao;
+import com.study.profile_stack_api.global.common.Page;
 import com.study.profile_stack_api.global.exception.ApiException;
 import com.study.profile_stack_api.global.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,9 +48,22 @@ public class ProfileService {
 
     // === Read ===
     public ProfileResponse getProfileById(Long id) {
+        // 검증
+        if (id == null || id <= 0) {
+            throw new ApiException(ErrorCode.INVALID_INPUT, "잘못된 id 값입니다.");
+        }
         Optional<Profile> result = repository.findById(id);
         Profile profile = result.orElseThrow(() -> new RuntimeException("Profile not found"));
         return ProfileResponse.from(profile);
+    }
+
+    public Page<Profile> getProfileWithPaging(Integer page, Integer size) {
+        // 검증
+        if (page == null || page < 0 || size == null || size <= 0) {
+            throw new ApiException(ErrorCode.INVALID_INPUT, "잘못된 입력 값입니다. page: %d, size: %d".formatted(page, size));
+        }
+
+        return repository.findWithPage(page, size);
     }
 
     // === Update ===

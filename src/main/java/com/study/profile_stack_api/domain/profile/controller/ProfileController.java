@@ -1,8 +1,10 @@
 package com.study.profile_stack_api.domain.profile.controller;
 
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +33,11 @@ public class ProfileController {
 
     // POST
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> createProfile() {
-        return ResponseEntity.ok().body(ApiResponse.success("createProfile"));
+    public ResponseEntity<ApiResponse<ProfileResponse>> createProfile(@RequestBody ProfileCreateRequest request) {
+        ProfileResponse response = profileService.createProfile(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response));
     }
 
     // PUT

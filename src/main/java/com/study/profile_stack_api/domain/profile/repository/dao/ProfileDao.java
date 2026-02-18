@@ -26,5 +26,6 @@ public interface ProfileDao {
     // utils
     long count();                                               // 전체 데이터의 갯수 확인
     boolean existsById(Long id);                                // id에 해당하는 데이터가 존재하는지 확인
+    boolean existsByEmail(String email);                        // email에 해당하는 데이터가 존재하는지 확인(email 중복 체크)
 
 }

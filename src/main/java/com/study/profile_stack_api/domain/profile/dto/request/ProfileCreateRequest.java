@@ -1,0 +1,15 @@
+package com.study.profile_stack_api.domain.profile.dto.request;
+
+import com.study.profile_stack_api.domain.profile.entity.Position;
+
+public record ProfileCreateRequest(
+        String name,
+        String email,
+        String bio,
+        String position,
+        Integer careerYears,
+        String githubUrl,
+        String blogUrl
+) {}
+
+

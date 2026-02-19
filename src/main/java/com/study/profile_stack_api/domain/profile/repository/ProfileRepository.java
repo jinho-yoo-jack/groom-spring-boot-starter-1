@@ -44,4 +44,22 @@ public class ProfileRepository {
     public boolean existsByEmail(String email) {
         return profileDao.existsByEmail(email);
     }
+
+    public List<Profile> findByPosition(String position, int page, int size) {
+        int offset = page * size;
+        return profileDao.findByPosition(position, offset, size);
+    }
+
+    public long countByPosition(String position) {
+        return profileDao.countByPosition(position);
+    }
+
+    public List<Profile> findByName(String name, int page, int size) {
+        int offset = page * size;
+        return profileDao.findByName(name, offset, size);
+    }
+
+    public long countByName(String name) {
+        return profileDao.countByName(name);
+    }
 }

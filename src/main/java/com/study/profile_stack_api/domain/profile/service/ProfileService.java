@@ -75,4 +75,18 @@ public class ProfileService {
         Profile updated = profileRepository.update(profile);
         return ProfileResponse.from(updated);
     }
+
+    public Page<ProfileResponse> getProfilesByPosition(String position, int page, int size) {
+        List<Profile> profiles = profileRepository.findByPosition(position, page, size);
+        long totalElements = profileRepository.countByPosition(position);
+        List<ProfileResponse> content = profiles.stream().map(ProfileResponse::from).toList();
+        return Page.of(content, page, size, totalElements);
+    }
+
+    public Page<ProfileResponse> searchProfilesByName(String name, int page, int size) {
+        List<Profile> profiles = profileRepository.findByName(name, page, size);
+        long totalElements = profileRepository.countByName(name);
+        List<ProfileResponse> content = profiles.stream().map(ProfileResponse::from).toList();
+        return Page.of(content, page, size, totalElements);
+    }
 }

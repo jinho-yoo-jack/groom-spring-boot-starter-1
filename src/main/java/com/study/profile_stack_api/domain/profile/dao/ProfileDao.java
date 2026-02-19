@@ -18,5 +18,13 @@ public interface ProfileDao {
 
     long count();
 
+    List<Profile> findByPosition(String position, int offset, int size);
+
+    long countByPosition(String position);
+
+    List<Profile> findByName(String name, int offset, int size);
+
+    long countByName(String name);
+
     boolean existsByEmail(String email);
 }

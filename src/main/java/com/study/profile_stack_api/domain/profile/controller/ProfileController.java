@@ -37,6 +37,24 @@ public class ProfileController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
+    @GetMapping("/position")
+    public ResponseEntity<ApiResponse<Page<ProfileResponse>>> getProfilesByPosition(
+            @RequestParam String position,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<ProfileResponse> result = profileService.getProfilesByPosition(position, page, size);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<ProfileResponse>>> searchProfiles(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<ProfileResponse> result = profileService.searchProfilesByName(name, page, size);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProfileResponse>> getProfile(@PathVariable(name = "id") Long id) {
         ProfileResponse profile = profileService.getProfile(id);

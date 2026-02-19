@@ -105,4 +105,28 @@ public class ProfileDaoImpl implements ProfileDao {
         String sql = "DELETE FROM profile WHERE id = ?";
         jdbcTemplate.update(sql, id);
     }
+
+    @Override
+    public List<Profile> findByPosition(String position, int offset, int size) {
+        String sql = "SELECT * FROM profile WHERE position = ? ORDER BY id DESC LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, profileRowMapper, position, size, offset);
+    }
+
+    @Override
+    public long countByPosition(String position) {
+        String sql = "SELECT COUNT(*) FROM profile WHERE position = ?";
+        return jdbcTemplate.queryForObject(sql, Long.class, position);
+    }
+
+    @Override
+    public List<Profile> findByName(String name, int offset, int size) {
+        String sql = "SELECT * FROM profile WHERE name LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?";
+        return jdbcTemplate.query(sql, profileRowMapper, "%" + name + "%", size, offset);
+    }
+
+    @Override
+    public long countByName(String name) {
+        String sql = "SELECT COUNT(*) FROM profile WHERE name LIKE ?";
+        return jdbcTemplate.queryForObject(sql, Long.class, "%" + name + "%");
+    }
 }

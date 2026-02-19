@@ -1,7 +1,9 @@
 package com.study.profile_stack_api.domain.profile.controller;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileSearchCondition;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
+import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteAllResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
@@ -12,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 프로필 컨트롤러
@@ -65,15 +66,11 @@ public class ProfileController {
             @RequestParam(required = false)
             String position
     ) {
-        List<ProfileResponse> responses;
+        // 검색 상태 확인
+        ProfileSearchCondition condition = new ProfileSearchCondition(name, position, 0, 0);
 
-        if ((name != null && !name.isBlank()) || (position != null && !position.isBlank())) {
-            // Service 호출하여 조건에 맞는 프로필 조회
-            responses = profileService.searchProfiles(name, position);
-        } else {
-            // Service 호출하여 모든 프로필 조회
-            responses = profileService.getAllProfiles();
-        }
+        // Service 호출하여 상태에 따른 전체 프로필 조회
+        List<ProfileResponse> responses = profileService.getSearchProfiles(condition);
 
         // 200 OK 상태 코드와 함께 응답
         return ResponseEntity
@@ -139,15 +136,11 @@ public class ProfileController {
             @RequestParam(defaultValue = "10")
             int size
     ) {
-        Page<ProfileResponse> response;
+        // 검색 상태 확인
+        ProfileSearchCondition condition = new ProfileSearchCondition(name, position, page, size);
 
-        if ((name != null && !name.isBlank()) || (position != null && !position.isBlank())) {
-            // Service 호출하여 조건에 맞는 프로필 페이징 조회
-            response = profileService.searchProfilesWithPaging(name, position, page, size);
-        } else {
-            // Service 호출하여 전체 프로필 페이징 조회
-            response = profileService.getProfilesWithPaging(page, size);
-        }
+        // Service 호출하여 상태에 따른 전체 프로필 페이징 조회
+        Page<ProfileResponse> response = profileService.getSearchProfilesWithPaging(condition);
 
         // 200 OK 상태 코드와 함께 응답
         return ResponseEntity
@@ -218,8 +211,8 @@ public class ProfileController {
      * DELETE /api/v1/profiles
      */
     @DeleteMapping
-    public ResponseEntity<ApiResponse<Map<String, Object>>> deleteAllProfiles() {
-        Map<String, Object> response = profileService.deleteAllProfiles();
+    public ResponseEntity<ApiResponse<ProfileDeleteAllResponse>> deleteAllProfiles() {
+        ProfileDeleteAllResponse response = profileService.deleteAllProfiles();
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

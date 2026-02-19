@@ -2,7 +2,9 @@ package com.study.profile_stack_api.domain.profile.service;
 
 import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileSearchCondition;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
+import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteAllResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Position;
@@ -13,7 +15,6 @@ import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -95,9 +96,7 @@ public class ProfileService {
 
         // 이름 검색어가 없거나 빈값이 아니면 필터링
         if (nameKeyword != null && !nameKeyword.isBlank()) {
-            profiles = profiles.stream()
-                    .filter(profile -> profile.getName().contains(nameKeyword))
-                    .toList();
+            //profiles = filterProfiles(profiles, (profile) -> profile.getName().contains(nameKeyword));
         }
 
         // 직무 검색어가 없거나 빈값이 아니면 필터링
@@ -108,10 +107,7 @@ public class ProfileService {
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("유효하지 않은 직무입니다: " + positionKeyword);
             }
-
-            profiles = profiles.stream()
-                    .filter(profile -> profile.getPosition() == position)
-                    .toList();
+            //profiles = filterProfiles(profiles, (profile) -> profile.getPosition() == position);
         }
 
         // Entity 리스트 -> Response DTO 리스트로 변환
@@ -159,6 +155,23 @@ public class ProfileService {
         return profiles.stream()
                 .map(ProfileResponse::from)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 검색 상태 확인 후 조건에 따라 프로필 조회
+     *
+     * @param condition 프로필 검색 상태
+     * @return 프로필 조회
+     */
+    public List<ProfileResponse> getSearchProfiles(ProfileSearchCondition condition) {
+        if ((condition.getName() != null && !condition.getName().isBlank()) ||
+                (condition.getPosition() != null && !condition.getPosition().isBlank())) {
+            // 조건에 맞는 프로필 조회
+            return searchProfiles(condition.getName(), condition.getPosition());
+        } else {
+            // 모든 프로필 조회
+            return getAllProfiles();
+        }
     }
 
     // ==================== PAGING ====================
@@ -253,6 +266,24 @@ public class ProfileService {
 
     }
 
+    /**
+     * 검색 상태 확인 후 조건에 따라 프로필 페이지 조회
+     *
+     * @param condition 프로필 검색 상태
+     * @return 페이지 조회
+     */
+    public Page<ProfileResponse> getSearchProfilesWithPaging(ProfileSearchCondition condition) {
+        if ((condition.getName() != null && !condition.getName().isBlank()) ||
+                (condition.getPosition() != null && !condition.getPosition().isBlank())) {
+            // 조건에 맞는 프로필 페이징 조회
+            return searchProfilesWithPaging(
+                    condition.getName(), condition.getPosition(), condition.getPage(), condition.getSize());
+        } else {
+            // 전체 프로필 페이징 조회
+            return getProfilesWithPaging(condition.getPage(), condition.getSize());
+        }
+    }
+
     // ==================== UPDATE ====================
 
     public ProfileResponse updateProfile(Long id, ProfileUpdateRequest request) {
@@ -323,15 +354,12 @@ public class ProfileService {
      *
      * @return 삭제 결과 응답
      */
-    public Map<String, Object> deleteAllProfiles() {
+    public ProfileDeleteAllResponse deleteAllProfiles() {
         // 프로필 총 개수 확인
         long deleteCount = profileDao.deleteAll();
 
         // 삭제 결과 반환
-        return Map.of(
-                "message", "전체 프로필이 성공적으로 삭제되었습니다.",
-                "deletedCount", deleteCount
-        );
+        return ProfileDeleteAllResponse.of(deleteCount);
     }
 
     // ==================== VALIDATION ====================

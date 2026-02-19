@@ -1,3 +1,40 @@
+# 서버 설정
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
 spring:
   application:
     name: my-spring-study-diary
+
+  # H2 데이터베이스 설정
+  datasource:
+    url: jdbc:h2:mem:diary_db
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      pool-name: StudyDiaryHikariCP
+
+  # H2 콘솔 활성화 (선택사항)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.study.profile_stack_api: DEBUG
+    org.springframework.jdbc: DEBUG
+    com.zaxxer.hikari: DEBUG

@@ -1,3 +1,26 @@
+# 서버 설정
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
 spring:
   application:
-    name: my-spring-study-diary
+    name: dev-info
+
+  profiles:
+    active: dev
+
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# 로깅 설정(공통)
+logging:
+  level:
+    root: INFO
+    com.study.myspringstudydiary: DEBUG
+    org.springframework.jdbc: DEBUG
+    com.zaxxer.hikari: DEBUG

@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.36
+    container_name: dev-info-mysql # dev-info-mysql로 컨테이너 이름 설정
+    restart: unless-stopped       # 컨테이너 자동 재시작 정책
+    ports:
+      - "${DB_PORT:-3306}:3306"   # 호스트 포트 : 내부 포트 / DB_PORT 환경변수가 있으면 그걸 사용, 없으면 기본값 3306 사용
+    environment:    # MySQL 실행시 주입할 환경변수
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}   # Root 계정 비밀번호
+      MYSQL_DATABASE: ${MYSQL_DATABASE}             # 컨테이너 최초 실행시 자동 생성할 DB 이름
+      MYSQL_USER: ${MYSQL_USER}                     # 새 일반 사용자 이름
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}             # 새 일반 사용자 비밀번호
+      TZ: ${TZ:-Asia/Seoul}                         # 컨테이너 내부 타임존
+    volumes:        # 볼륨 마운트, 데이터 영속화 및 파일 연결 - 여기 좀 헷갈림
+      - mysql-data:/var/lib/mysql     # [mysql Named Volume] : [파일 위치] => MySQL 데이터를 컨테이너 네임드 저장소에 연결하여 저장
+      #- ./src/main/resources/db:/docker-entrypoint-initdb.d:ro
+      - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql # [파일 위치 - Bind Mount] : [컨테이너 내부 경로] => 파일을 해당 디랙토리 내부에 그대로 연결
+      - ./src/main/resources/db/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    command:      # MySQL 실행 시 옵션
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+    networks:    # 이 컨테이너를 네트워크에 연결 - 여기 잘 모름
+      - dev-info-network
+
+volumes:      # 볼륨 정의
+  mysql-data:
+    driver: local
+
+networks:     # 네트워크 생성 -> 같은 네트워트 컨테이너끼리 통신 가능 / 지금은 컨테이너에 MySQL만 있어서 네트워크가 없어도 됨
+  dev-info-network:
+    driver: bridge

@@ -1,7 +1,6 @@
 package com.study.profile_stack_api.domain.techstack.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +9,9 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TechStack {
     private Long id;
     private Long profileId;
@@ -17,21 +19,8 @@ public class TechStack {
     private TechCategory category;
     private Proficiency proficiency;
     private Integer yearsOfExp;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    public TechStack() {}
-
-    public TechStack(Long id, Long profileId, String name, TechCategory category, Proficiency proficiency, Integer yearsOfExp) {
-        this.id = id;
-        this.profileId = profileId;
-        this.name = name;
-        this.category = category;
-        this.proficiency = proficiency;
-        this.yearsOfExp = yearsOfExp;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();;
 
     /**
      * 기술 스택 정보 수정

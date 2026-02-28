@@ -4,14 +4,16 @@ import com.study.profile_stack_api.domain.profile.validation.NotBlankIfPresent;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * 프로필 수정 요청 DTO
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProfileUpdateRequest {
 
     @NotBlankIfPresent(message = "이름은 빈 값일 수 없습니다.")

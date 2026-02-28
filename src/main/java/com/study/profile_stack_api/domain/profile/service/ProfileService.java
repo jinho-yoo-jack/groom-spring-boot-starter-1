@@ -12,6 +12,8 @@ import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.global.common.Page;
 import com.study.profile_stack_api.global.exception.DuplicateEmailException;
 import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,20 +24,15 @@ import java.util.stream.Collectors;
 /**
  * 프로필 서비스
  */
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProfileService {
     /** 의존성 주입: DAO 인터페이스 */
     private final ProfileDao profileDao;
 
     /** 페이징 관련 상수 */
     private static final int MAX_PAGE_SIZE = 100;
-
-    /**
-     * 생성자 주입
-     */
-    public ProfileService(ProfileDao profileDao) {
-        this.profileDao = profileDao;
-    }
 
     // ==================== CREATE ====================
 
@@ -49,16 +46,16 @@ public class ProfileService {
         validataCreateRequest(request);
 
         // DTO -> Entity변환
-        Profile profile = new Profile(
-                null,
-                request.getName(),
-                request.getEmail(),
-                request.getBio(),
-                Position.valueOf(request.getPosition()),
-                request.getCareerYears(),
-                request.getGithubUrl(),
-                request.getBlogUrl()
-        );
+        Profile profile = Profile.builder()
+                .id(null)
+                .name(request.getName())
+                .email(request.getEmail())
+                .bio(request.getBio())
+                .position(Position.valueOf(request.getPosition()))
+                .careerYears(request.getCareerYears())
+                .githubUrl(request.getGithubUrl())
+                .blogUrl(request.getBlogUrl())
+                .build();
 
         // 저장
         Profile savedProfile = profileDao.save(profile);

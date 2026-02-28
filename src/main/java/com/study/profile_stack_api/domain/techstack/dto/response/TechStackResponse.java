@@ -2,7 +2,9 @@ package com.study.profile_stack_api.domain.techstack.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
  * 기술 스택 응답 DTO
  */
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonPropertyOrder({
         "id", "profileId", "name",
         "category", "categoryIcon",

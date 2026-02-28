@@ -1,11 +1,13 @@
 package com.study.profile_stack_api.domain.techstack.entity;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 숙련도 Enum
  */
 @Getter
+@RequiredArgsConstructor
 public enum Proficiency {
     BEGINNER("🌱", "입문"),
     INTERMEDIATE("🌿", "중급"),
@@ -14,9 +16,4 @@ public enum Proficiency {
 
     private final String icon;
     private final String description;
-
-    Proficiency(String icon, String description) {
-        this.icon = icon;
-        this.description = description;
-    }
 }

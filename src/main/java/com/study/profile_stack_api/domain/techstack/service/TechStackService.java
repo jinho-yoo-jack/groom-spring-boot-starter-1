@@ -13,6 +13,8 @@ import com.study.profile_stack_api.domain.techstack.entity.TechStack;
 import com.study.profile_stack_api.global.common.Page;
 import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +25,9 @@ import java.util.stream.Collectors;
 /**
  * 기술 스택 서비스
  */
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class TechStackService {
     /** 의존성 주입: Repository */
     private final TechStackDao techStackDao;
@@ -31,14 +35,6 @@ public class TechStackService {
 
     /** 페이징 관련 상수 */
     private static final int MAX_PAGE_SIZE = 100;
-
-    /**
-     * 생성자 주입
-     */
-    public TechStackService(TechStackDao techStackDao, ProfileDao profileDao) {
-        this.techStackDao = techStackDao;
-        this.profileDao = profileDao;
-    }
 
     // ==================== CREATE ====================
 
@@ -57,14 +53,14 @@ public class TechStackService {
         Profile profile = validataProfileId(profileId);
 
         // DTO -> Entity변환
-        TechStack techStack = new TechStack(
-                null,
-                profile.getId(),
-                request.getName(),
-                TechCategory.valueOf(request.getCategory()),
-                Proficiency.valueOf(request.getProficiency()),
-                request.getYearsOfExp()
-        );
+        TechStack techStack = TechStack.builder()
+                .id(null)
+                .profileId(profile.getId())
+                .name(request.getName())
+                .category(TechCategory.valueOf(request.getCategory()))
+                .proficiency(Proficiency.valueOf(request.getProficiency()))
+                .yearsOfExp(request.getYearsOfExp())
+                .build();
 
         // 저장
         TechStack savedTechStack = techStackDao.saveByProfileId(profileId, techStack);

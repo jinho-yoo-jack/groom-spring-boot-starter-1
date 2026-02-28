@@ -7,6 +7,8 @@ import com.study.profile_stack_api.domain.techstack.dto.response.TechStackRespon
 import com.study.profile_stack_api.domain.techstack.service.TechStackService;
 import com.study.profile_stack_api.global.common.ApiResponse;
 import com.study.profile_stack_api.global.common.Page;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +19,13 @@ import java.util.Map;
 /**
  * 기술 스택 컨트롤러
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/profiles/{profileId}/tech-stacks")
+@RequiredArgsConstructor
 public class TechStackController {
     /** 의존성 주입: Service */
     private final TechStackService techStackService;
-
-    /**
-     * 생성자 주입
-     */
-    public TechStackController(TechStackService techStackService) {
-        this.techStackService = techStackService;
-    }
 
     // ==================== CREATE ====================
 

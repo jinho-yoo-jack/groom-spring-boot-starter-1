@@ -2,7 +2,10 @@ package com.study.profile_stack_api.domain.profile.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +13,9 @@ import java.time.LocalDateTime;
  * 프로필 응답 DTO
  */
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @JsonPropertyOrder({
         "id", "name", "email",
         "bio", "position", "positionIcon",

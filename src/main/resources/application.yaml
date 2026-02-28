@@ -45,3 +45,9 @@ logging:
     com.study.profile_stack_api: DEBUG
     org.springframework.jdbc: DEBUG
     com.zaxxer.hikari: DEBUG
+
+# JWT 설정
+jwt:
+  secret: "YourBase64EncodedSecretKeyHereMustBeAtLeast256BitsLong!!"
+  access-token-expiration: 1_800_000    # 30분 (밀리초)
+  refresh-token-expiration: 604_800_000 # 7일 (밀리초)

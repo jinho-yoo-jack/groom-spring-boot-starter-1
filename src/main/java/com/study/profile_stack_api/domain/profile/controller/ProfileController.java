@@ -11,6 +11,8 @@ import com.study.profile_stack_api.domain.profile.validation.UniqueEmailOnUpdate
 import com.study.profile_stack_api.global.common.ApiResponse;
 import com.study.profile_stack_api.global.common.Page;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,19 +23,14 @@ import java.util.List;
 /**
  * 프로필 컨트롤러
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/profiles")
 @Validated
+@RequiredArgsConstructor
 public class ProfileController {
     /** 의존성 주입: Service */
     private final ProfileService profileService;
-
-    /**
-     * 생성자 주입
-     */
-    public ProfileController(ProfileService profileService) {
-        this.profileService = profileService;
-    }
 
     // ==================== CREATE ====================
 

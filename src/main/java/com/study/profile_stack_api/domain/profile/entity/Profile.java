@@ -1,7 +1,6 @@
 package com.study.profile_stack_api.domain.profile.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +9,9 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Profile {
     private Long id;
     private String name;
@@ -19,24 +21,8 @@ public class Profile {
     private Integer careerYears;
     private String githubUrl;
     private String blogUrl;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    public Profile() {}
-
-    public Profile(Long id, String name, String email, String bio, Position position, Integer careerYears,
-                   String githubUrl, String blogUrl) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.bio = bio;
-        this.position = position;
-        this.careerYears = careerYears;
-        this.githubUrl = githubUrl;
-        this.blogUrl = blogUrl;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     /**
      * 프로필 정보 수정

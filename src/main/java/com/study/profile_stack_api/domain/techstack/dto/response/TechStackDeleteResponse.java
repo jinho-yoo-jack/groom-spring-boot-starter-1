@@ -1,13 +1,17 @@
 package com.study.profile_stack_api.domain.techstack.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * 기술 스택 삭제 응답 DTO
  */
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @JsonPropertyOrder({"message", "deletedId"})
 public class TechStackDeleteResponse {

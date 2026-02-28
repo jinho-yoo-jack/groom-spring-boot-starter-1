@@ -46,5 +46,7 @@ public interface ProfileDao {
 
     boolean existsByEmail(String email);
 
+    boolean existsByEmailAndIdNot(Long id, String email);
+
     boolean existsById(Long id);
 }

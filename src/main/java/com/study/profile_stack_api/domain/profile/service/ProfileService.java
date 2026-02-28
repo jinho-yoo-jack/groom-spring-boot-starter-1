@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -96,7 +97,7 @@ public class ProfileService {
 
         // 이름 검색어가 없거나 빈값이 아니면 필터링
         if (nameKeyword != null && !nameKeyword.isBlank()) {
-            //profiles = filterProfiles(profiles, (profile) -> profile.getName().contains(nameKeyword));
+            profiles = filterProfiles(profiles, (profile) -> profile.getName().contains(nameKeyword));
         }
 
         // 직무 검색어가 없거나 빈값이 아니면 필터링
@@ -107,7 +108,7 @@ public class ProfileService {
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("유효하지 않은 직무입니다: " + positionKeyword);
             }
-            //profiles = filterProfiles(profiles, (profile) -> profile.getPosition() == position);
+            profiles = filterProfiles(profiles, (profile) -> profile.getPosition() == position);
         }
 
         // Entity 리스트 -> Response DTO 리스트로 변환
@@ -300,7 +301,7 @@ public class ProfileService {
         }
 
         // 수정값 유효성 검증
-        validataUpdateRequest(request);
+        validataUpdateRequest(id, request);
 
         // 직무 변환 (Null 아닌 경우에만)
         Position position = null;
@@ -368,71 +369,29 @@ public class ProfileService {
      * 생성 요청 유효성 검증
      */
     private void validataCreateRequest(ProfileCreateRequest request) {
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("이름은 필수입니다.");
-        }
-
-        if (request.getName().length() > 50) {
-            throw new IllegalArgumentException("이름은 50자를 초과할 수 없습니다.");
-        }
-
-        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("이메일은 필수입니다.");
-        }
-
-        if (request.getEmail().length() > 100) {
-            throw new IllegalArgumentException("이메일은 100자를 초과할 수 없습니다.");
-        }
-
         if (profileDao.existsByEmail(request.getEmail())) {
             throw new DuplicateEmailException(request.getEmail());
         }
+    }
 
-        if (request.getBio().length() > 500) {
-            throw new IllegalArgumentException("자기소개는 500자를 초과할 수 없습니다.");
-        }
-
-        if (request.getPosition() == null || request.getPosition().trim().isEmpty()) {
-            throw new IllegalArgumentException("직무는 필수입니다.");
-        }
-
-        if (request.getCareerYears() == null || request.getCareerYears() < 0) {
-            throw new IllegalArgumentException("경력은 0년 이상이어야 합니다.");
+    public void validataUpdateRequest(Long id,ProfileUpdateRequest request) {
+        if (profileDao.existsByEmailAndIdNot(id, request.getEmail())) {
+            throw new DuplicateEmailException(request.getEmail());
         }
     }
 
-    public void validataUpdateRequest(ProfileUpdateRequest request) {
-        if (request.getName() != null) {
-            if (request.getName().trim().isEmpty()) {
-                throw new IllegalArgumentException("이름은 빈 값일 수 없습니다.");
-            }
-            if (request.getName().length() > 50) {
-                throw new IllegalArgumentException("이름은 50자를 초과할 수 없습니다.");
-            }
-        }
+    // ==================== PRIVATE METHODS ====================
 
-        if (request.getEmail() != null) {
-            if (request.getEmail().trim().isEmpty()) {
-                throw new IllegalArgumentException("이메일은 빈 값일 수 없습니다.");
-            }
-            if (request.getEmail().length() > 100) {
-                throw new IllegalArgumentException("이메일은 100자를 초과할 수 없습니다.");
-            }
-            if (profileDao.existsByEmail(request.getEmail())) {
-                throw new DuplicateEmailException(request.getEmail());
-            }
-        }
-
-        if (request.getBio() != null && request.getBio().length() > 500) {
-            throw new IllegalArgumentException("자기소개는 500자를 초과할 수 없습니다.");
-        }
-
-        if (request.getPosition() != null && request.getPosition().trim().isEmpty()) {
-            throw new IllegalArgumentException("직무는 빈 값일 수 없습니다.");
-        }
-
-        if (request.getCareerYears() != null && request.getCareerYears() < 0) {
-            throw new IllegalArgumentException("경력은 0년 이상이어야 합니다.");
-        }
+    /**
+     * 범용 필터
+     *
+     * @param profiles  프로필 리스트
+     * @return 필터링된 프로필 리스트
+     */
+    private List<Profile> filterProfiles(List<Profile> profiles, Predicate<Profile> predicate) {
+        profiles = profiles.stream()
+                .filter(predicate)
+                .toList();
+        return profiles;
     }
 }

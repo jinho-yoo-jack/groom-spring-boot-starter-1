@@ -7,10 +7,13 @@ import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteAllR
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
+import com.study.profile_stack_api.domain.profile.validation.UniqueEmailOnUpdate;
 import com.study.profile_stack_api.global.common.ApiResponse;
 import com.study.profile_stack_api.global.common.Page;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/profiles")
+@Validated
 public class ProfileController {
     /** 의존성 주입: Service */
     private final ProfileService profileService;
@@ -39,6 +43,7 @@ public class ProfileController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<ProfileResponse>> createProfile(
+        @Valid
         @RequestBody
         ProfileCreateRequest request
     ) {
@@ -181,9 +186,11 @@ public class ProfileController {
      * PUT /api/v1/profiles/{id}
      */
     @PutMapping("/{id}")
+    @UniqueEmailOnUpdate
     public ResponseEntity<ApiResponse<ProfileResponse>> updateProfile(
         @PathVariable
         Long id,
+        @Valid
         @RequestBody
         ProfileUpdateRequest request
     ) {

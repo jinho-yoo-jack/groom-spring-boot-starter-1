@@ -289,7 +289,7 @@ public class MySQLTechStackDaoImpl implements TechStackDao {
      */
     @Override
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM profile WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM tech_stack WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
     }

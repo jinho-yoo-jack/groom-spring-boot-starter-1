@@ -1,6 +1,7 @@
 package com.study.profile_stack_api.global.exception;
 
 import com.study.profile_stack_api.global.common.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,6 +23,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(
             IllegalArgumentException e
+    ) {
+        return buildErrorResponse(ErrorCode.INVALID_INPUT, e.getMessage());
+    }
+
+    // ConstraintViolationException 처리
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConstraintViolationException(
+            ConstraintViolationException e
     ) {
         return buildErrorResponse(ErrorCode.INVALID_INPUT, e.getMessage());
     }

@@ -164,7 +164,7 @@ public class MySQLProfileDaoImpl implements ProfileDao {
         String dataSql = """
                 SELECT * FROM profile
                 WHERE position = ?
-                ORDER BY created_at, id DESC
+                ORDER BY created_at DESC, id DESC
                 LIMIT ? OFFSET ?
                 """;
 
@@ -294,6 +294,13 @@ public class MySQLProfileDaoImpl implements ProfileDao {
     public boolean existsByEmail(String email) {
         String sql = "SELECT COUNT(*) FROM profile WHERE LOWER(email) = LOWER(?)";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean existsByEmailAndIdNot(Long id, String email) {
+        String sql = "SELECT COUNT(*) FROM profile WHERE id != ? AND LOWER(email) = LOWER(?)";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id, email);
         return count != null && count > 0;
     }
 

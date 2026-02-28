@@ -14,8 +14,6 @@ public class ProfileDeleteAllResponse {
     private String message;
     private Long deleteCount;
 
-    private ProfileDeleteAllResponse() {}
-
     public static ProfileDeleteAllResponse of(Long count) {
         return ProfileDeleteAllResponse.builder()
                 .message("전체 프로필이 성공적으로 삭제되었습니다.")

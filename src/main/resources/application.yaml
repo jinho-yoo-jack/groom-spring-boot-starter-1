@@ -1,26 +1,18 @@
 # 서버 설정
 server:
-  port: 8080
+  port: 8081
   servlet:
-    context-path: /
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
-
+    context-path:
 spring:
   application:
-    name: my-spring-study-diary
-  messages:
-    basename: messages,ValidationMessages
-    encoding: UTF-8
+    name: profile_stack_api
 
-  # H2 데이터베이스 설정
+  # MySQL 데이터베이스 설정
   datasource:
-    url: jdbc:h2:mem:diary_db
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://localhost:3306/diary_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: rootpass
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 10
@@ -28,11 +20,19 @@ spring:
       idle-timeout: 600000
       pool-name: StudyDiaryHikariCP
 
-  # H2 콘솔 활성화 (선택사항)
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  # SQL 로깅 설정
+  sql:
+    init:
+      mode: always
+      platform: mysql
+      encoding: UTF-8
+  #      schema-locations: classpath:db/schema.sql
+  #      data-locations: classpath:db/data.sql
+
+  # Validation
+  messages:
+    basename: messages/validation
+    encoding: UTF-8
 
 # 로깅 설정
 logging:

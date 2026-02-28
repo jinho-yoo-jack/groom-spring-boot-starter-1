@@ -8,6 +8,7 @@ import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.global.common.Page;
 import com.study.profile_stack_api.global.exception.DuplicateEmailException;
 import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
+import com.study.profile_stack_api.global.mapper.ProfileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class ProfileService {
 
     private final ProfileDao profileDao;
+    private final ProfileMapper profileMapper;
 
     private static final int MAX_PAGE_SIZE = 100;
 
@@ -31,12 +33,16 @@ public class ProfileService {
      */
     public ProfileResponse save(ProfileRequest request) {
 
+        Profile profile = profileMapper.toEntity(request);
+
         profileDao.getEmail(request.getEmail())
-                .ifPresent(profile -> {
+                .ifPresent(profileByEmail -> {
                     throw new DuplicateEmailException(profile.getEmail());
                 });
 
-        return ProfileResponse.from(profileDao.save(new Profile(request)));
+        Profile savedProfile =  profileDao.save(profile);
+
+        return profileMapper.toResponse(savedProfile);
     }
 
     // ================ READ ====================
@@ -55,7 +61,7 @@ public class ProfileService {
         Page<Profile> profilePage = profileDao.getAllProfiles(page, size, position, name);
 
         List<ProfileResponse> content = profilePage.getContent().stream()
-                .map(ProfileResponse::from)
+                .map(profileMapper::toResponse)
                 .collect(Collectors.toList());
 
         return new Page<>(content, page, size, profilePage.getTotalElements());
@@ -69,7 +75,7 @@ public class ProfileService {
     public ProfileResponse getProfile(long id) {
 
         return profileDao.getProfile(id)
-                .map(ProfileResponse::from)
+                .map(profileMapper::toResponse)
                 .orElseThrow(() -> new ProfileNotFoundException(id));
     }
 
@@ -81,7 +87,7 @@ public class ProfileService {
     public List<ProfileResponse> searchProfileByPosition(String position) {
 
         return profileDao.searchProfileByPosition(position).stream()
-                .map(ProfileResponse::from)
+                .map(profileMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -101,7 +107,10 @@ public class ProfileService {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
 
-        return ProfileResponse.from(profileDao.updateProfile(profile.update(profileRequest)));
+        profileMapper.partialUpdate(profileRequest, profile);
+        Profile savedProfile = profileDao.updateProfile(profile);
+
+        return profileMapper.toResponse(savedProfile);
     }
 
     // ================ DELETE ====================

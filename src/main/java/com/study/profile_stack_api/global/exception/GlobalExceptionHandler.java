@@ -1,7 +1,6 @@
 package com.study.profile_stack_api.global.exception;
 
 import com.study.profile_stack_api.global.common.ApiResponse;
-import com.study.profile_stack_api.global.dto.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

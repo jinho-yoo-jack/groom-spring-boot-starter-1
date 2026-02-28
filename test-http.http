@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:8080
+@baseUrl = http://localhost:8081
 @contentType = application/json
 
 ### ================================
@@ -39,7 +39,7 @@ GET {{baseUrl}}/api/v1/profiles?page=0&size=10
 GET {{baseUrl}}/api/v1/profiles?page=0&size=10&position=FRONTEND&name=이리
 
 ### 2-2 프로필 단건 ID 조회
-GET {{baseUrl}}/api/v1/profiles/-5
+GET {{baseUrl}}/api/v1/profiles/3
 
 ### 2-3 직무별 프로필 조회
 GET {{baseUrl}}/api/v1/profiles/position/BACKEND

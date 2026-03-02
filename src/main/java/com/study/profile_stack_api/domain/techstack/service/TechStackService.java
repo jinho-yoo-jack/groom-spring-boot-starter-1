@@ -9,6 +9,7 @@ import com.study.profile_stack_api.domain.techstack.entity.TechStack;
 import com.study.profile_stack_api.global.common.Page;
 import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
+import com.study.profile_stack_api.global.mapper.TechStackMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class TechStackService {
 
     private final TechStackDao techstackDao;
     private final ProfileDao profileDao;
+    private final TechStackMapper techStackMapper;
 
     private static final int MAX_PAGE_SIZE = 100;
 
@@ -38,10 +40,9 @@ public class TechStackService {
         profileDao.getProfile(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. (id : " + profileId + ")"));
 
-        TechStack techStack = new TechStack(techstackRequest);
-        techStack.setProfileId(profileId);
+        TechStack techStack = techStackMapper.toEntity(techstackRequest);
 
-        return TechStackResponse.from(techstackDao.save(techStack));
+        return techStackMapper.toResponse(techStack);
     }
 
     //=============== READ ====================
@@ -67,7 +68,7 @@ public class TechStackService {
         Page<TechStack> techStackPage = techstackDao.getAllTechStacks(profileId, page, size, category, proficiency);
 
         List<TechStackResponse> content = techStackPage.getContent().stream()
-                                            .map(TechStackResponse::from)
+                                            .map(techStackMapper::toResponse)
                                             .collect(Collectors.toList());
 
         return new Page<>(content, page, size, techStackPage.getTotalElements());
@@ -87,7 +88,7 @@ public class TechStackService {
         TechStack techStack = techstackDao.getTechStack(id)
                 .orElseThrow(() -> new TechStackNotFoundException(id));
 
-        return TechStackResponse.from(techStack);
+        return techStackMapper.toResponse(techStack);
     }
 
     //=============== READ ====================
@@ -110,7 +111,10 @@ public class TechStackService {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
 
-        return TechStackResponse.from(techstackDao.updateTechStack(profileId, id, techStack.update(techStackRequest)));
+        techStackMapper.partialUpdate(techStackRequest, techStack);
+        techstackDao.updateTechStack(profileId, id, techStack);
+
+        return techStackMapper.toResponse(techStack);
     }
 
 

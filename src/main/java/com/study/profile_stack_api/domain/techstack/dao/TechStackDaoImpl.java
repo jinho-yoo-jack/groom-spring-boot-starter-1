@@ -118,7 +118,7 @@ public class TechStackDaoImpl implements TechStackDao {
         }
     }
 
-    //============== READ ===================
+    //============== UPDATE ===================
 
     @Override
     public TechStack updateTechStack(long profileId, long id, TechStack techStack) {
@@ -130,8 +130,8 @@ public class TechStackDaoImpl implements TechStackDao {
 
         int updated = jdbcTemplate.update(sql,
                 techStack.getName(),
-                techStack.getTechCategory().getDescription(),
-                techStack.getProficiency().getDescription(),
+                techStack.getTechCategory().name(),
+                techStack.getProficiency().name(),
                 techStack.getYearsOfExp(),
                 profileId,
                 id);

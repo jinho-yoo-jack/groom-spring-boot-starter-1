@@ -50,7 +50,7 @@ GET {{baseUrl}}/api/v1/profiles/1/tech-stacks?page=0&size=10
 GET {{baseUrl}}/api/v1/profiles/1/tech-stacks?page=0&size=5&category=TOOL
 
 ### 2-5 기술 단건 조회
-GET {{baseUrl}}/api/v1/profiles/1/tech-stacks/18
+GET {{baseUrl}}/api/v1/profiles/1/tech-stacks/4
 
 ### ================================
 ### 3. UPDATE - 프로필 수정

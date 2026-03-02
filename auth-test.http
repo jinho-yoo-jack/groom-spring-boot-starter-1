@@ -1,0 +1,30 @@
+### JWT Authentication API Tests
+### Spring Boot JWT 인증 시스템 테스트 파일
+
+### 환경 변수 설정
+@host = http://localhost:8081
+@contentType = application/json
+
+### ========================================
+### 1. 회원가입 테스트
+### ========================================
+
+### 1-1. 회원가입 성공
+POST {{host}}/api/v1/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser{{$timestamp}}",
+  "password": "SecurePassword123!",
+  "email": "testuser{{$timestamp}}@example.com"
+}
+
+### 1-2. 중복 사용자명으로 회원가입 시도 (실패 예상)
+POST {{host}}/api/v1/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser1772428315",
+  "password": "SecurePassword123!",
+  "email": "duplicate@example.com"
+}

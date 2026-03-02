@@ -1,12 +1,14 @@
 package com.study.profile_stack_api.domain.profile.controller;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
 import com.study.profile_stack_api.global.common.Page;
 import jakarta.servlet.ServletResponse;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -31,7 +33,9 @@ public class ProfileController {
      * POST /api/v1/profiles
      */
     @PostMapping
-    public  ResponseEntity<ApiResponse<ProfileResponse>> createProfile(@RequestBody ProfileRequest request, ServletResponse servletResponse) {
+    public  ResponseEntity<ApiResponse<ProfileResponse>> createProfile(
+            @Valid  @RequestBody ProfileRequest request,
+            ServletResponse servletResponse) {
 
         return ResponseEntity
                 .ok()
@@ -95,15 +99,15 @@ public class ProfileController {
     /**
      * 프로필 수정
      * @param id
-     * @param profileRequest
+     * @param ProfileUpdateRequest
      * @return
      */
     @PutMapping("/{id}")
     public ProfileResponse updateProfileByPosition(
             @PathVariable long id,
-            @RequestBody ProfileRequest profileRequest) {
+            @Valid @RequestBody ProfileUpdateRequest ProfileUpdateRequest) {
 
-        return profileService.updateProfile(id, profileRequest);
+        return profileService.updateProfile(id, ProfileUpdateRequest);
     }
 
     // ================ DELETE ==================

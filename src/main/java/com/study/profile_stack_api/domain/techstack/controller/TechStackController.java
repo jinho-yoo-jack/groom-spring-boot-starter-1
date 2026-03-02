@@ -1,18 +1,22 @@
 package com.study.profile_stack_api.domain.techstack.controller;
 
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackRequest;
+import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.service.TechStackService;
 import com.study.profile_stack_api.global.common.ApiResponse;
 import com.study.profile_stack_api.global.common.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/profiles")
 @RequiredArgsConstructor
+@Validated
 public class TechStackController {
 
     private final TechStackService techStackService;
@@ -26,7 +30,9 @@ public class TechStackController {
      * @return
      */
     @PostMapping("/{profileId}/tech-stacks")
-    public TechStackResponse createTechstack(@PathVariable long profileId, @RequestBody TechStackRequest techstackRequest) {
+    public TechStackResponse createTechStack(
+            @PathVariable long profileId,
+            @Valid @RequestBody TechStackRequest techstackRequest) {
         return techStackService.save(profileId, techstackRequest);
     }
 
@@ -74,19 +80,19 @@ public class TechStackController {
      * 기술 스택 수정
      * @param profileId
      * @param id
-     * @param techStackRequest
+     * @param TechStackUpdateRequest
      * @return
      */
     @PutMapping("/{profileId}/tech-stacks/{id}")
     public TechStackResponse updateTechStack(
             @PathVariable long profileId,
             @PathVariable long id,
-            @RequestBody TechStackRequest techStackRequest) {
+            @Valid @RequestBody TechStackUpdateRequest TechStackUpdateRequest) {
 
-        return techStackService.updateTechStack(profileId, id, techStackRequest);
+        return techStackService.updateTechStack(profileId, id, TechStackUpdateRequest);
     }
 
-    // =============== UPDATE ==================
+    // =============== DELETE ==================
 
     /**
      * 기술 스택 삭제

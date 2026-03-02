@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.profile.service;
 
 import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
@@ -100,15 +101,15 @@ public class ProfileService {
     /**
      * 프로필 수정
      * @param id
-     * @param profileRequest
+     * @param profileUpdateRequest
      * @return
      */
-    public ProfileResponse updateProfile(long id, ProfileRequest profileRequest) {
+    public ProfileResponse updateProfile(long id, ProfileUpdateRequest profileUpdateRequest) {
 
         Profile profile = profileDao.getProfile(id)
                 .orElseThrow(() -> new IllegalArgumentException("수정할 프로필이 없습니다. (id : " + id + ")"));
 
-        if (profileRequest.hasNoUpdates()) {
+        if (profileUpdateRequest.hasNoUpdates()) {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
 
@@ -118,7 +119,7 @@ public class ProfileService {
             throw new UnauthorizedException("본인 프로필만 수정 가능합니다.");
         }
 
-        profileMapper.partialUpdate(profileRequest, profile);
+        profileMapper.partialUpdate(profileUpdateRequest, profile);
         Profile savedProfile = profileDao.updateProfile(profile);
 
         return profileMapper.toResponse(savedProfile);

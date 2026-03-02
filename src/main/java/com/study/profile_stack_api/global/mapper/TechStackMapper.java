@@ -1,6 +1,7 @@
 package com.study.profile_stack_api.global.mapper;
 
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackRequest;
+import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.entity.Proficiency;
 import com.study.profile_stack_api.domain.techstack.entity.TechCategory;
@@ -45,7 +46,7 @@ public interface TechStackMapper {
      * @param request
      * @param entity
      */
-    default void partialUpdate(TechStackRequest request, TechStack entity) {
+    default void partialUpdate(TechStackUpdateRequest request, TechStack entity) {
         if (request.getName() != null) {
             entity.updateName(request.getName());
         }

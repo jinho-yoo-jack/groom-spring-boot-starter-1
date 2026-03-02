@@ -4,6 +4,7 @@ import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.techstack.dao.TechStackDao;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackRequest;
+import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
@@ -49,8 +50,8 @@ public class TechStackService {
             throw new UnauthorizedException("본인 기술스택만 입력 가능합니다.");
         }
 
-        techstackRequest.setProfileId(profileId);
         TechStack techStack = techStackMapper.toEntity(techstackRequest);
+        techStack.setProfileId(profileId);
 
         techstackDao.save(techStack);
 
@@ -109,17 +110,17 @@ public class TechStackService {
      * 기술 스택 수정
      * @param profileId
      * @param id
-     * @param techStackRequest
+     * @param TechStackUpdateRequest
      * @return
      */
-    public TechStackResponse updateTechStack(long profileId, long id, TechStackRequest techStackRequest) {
+    public TechStackResponse updateTechStack(long profileId, long id, TechStackUpdateRequest TechStackUpdateRequest) {
         Profile profile = profileDao.getProfile(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. (id : " + profileId + ")"));
 
         TechStack techStack = techstackDao.getTechStack(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 기술스택을 찾을 수 없습니다. (id : " + id + ")"));
 
-        if (techStackRequest.hasNoUpdates()) {
+        if (TechStackUpdateRequest.hasNoUpdates()) {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
 
@@ -129,7 +130,7 @@ public class TechStackService {
             throw new UnauthorizedException("본인 기술스택만 수정 가능합니다.");
         }
 
-        techStackMapper.partialUpdate(techStackRequest, techStack);
+        techStackMapper.partialUpdate(TechStackUpdateRequest, techStack);
         techstackDao.updateTechStack(profileId, id, techStack);
 
         return techStackMapper.toResponse(techStack);

@@ -1,6 +1,7 @@
 package com.study.profile_stack_api.global.mapper;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
@@ -53,7 +54,7 @@ public interface ProfileMapper {
      * @param request 업데이트 요청 DTO
      * @param entity 업데이트할 기존 Entity
      */
-    default void partialUpdate(ProfileRequest request, Profile entity) {
+    default void partialUpdate(ProfileUpdateRequest request, Profile entity) {
         if (request.getName() != null) {
             entity.updateName(request.getName());
         }

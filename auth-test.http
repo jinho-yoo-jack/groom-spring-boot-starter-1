@@ -134,7 +134,38 @@ Authorization: Bearer {{accessToken}}
     "careerYears": 4
 }
 
-
 ### 4-1. 프로필 삭제
 DELETE {{host}}/api/v1/profiles/4
 Authorization: Bearer {{accessToken}}
+
+
+### ========================================
+### 6. TechStack API 테스트
+### ========================================
+
+### 1-2. 기술스택 생성
+POST {{host}}/api/v1/profiles/4/tech-stacks
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+    "name": "Kotlin",
+    "category": "LANGUAGE",
+    "proficiency": "BEGINNER",
+    "yearsOfExp": 1
+}
+
+### 3-2. 기술스택 수정
+PUT {{host}}/api/v1/profiles/4/tech-stacks/18
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+    "proficiency": "INTERMEDIATE",
+    "yearsOfExp": 2
+}
+
+### 4-2. 기술 스택 삭제
+DELETE {{host}}/api/v1/profiles/4/tech-stacks/18
+Authorization: Bearer {{accessToken}}
+

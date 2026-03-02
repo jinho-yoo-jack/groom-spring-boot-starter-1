@@ -40,7 +40,7 @@ POST {{host}}/api/v1/auth/login
 Content-Type: {{contentType}}
 
 {
-  "username": "testuser1772436769",
+  "username": "testuser1772437275",
   "password": "SecurePassword123!"
 }
 
@@ -80,10 +80,6 @@ Content-Type: {{contentType}}
   "refreshToken": "{{refreshToken}}"
 }
 
-### 새로운 토큰 저장
-@newAccessToken = {{tokenRefresh.response.body.data.accessToken}}
-@newRefreshToken = {{tokenRefresh.response.body.data.refreshToken}}
-
 ### 3-2. 잘못된 Refresh Token으로 갱신 시도 (실패 예상)
 POST {{host}}/api/v1/auth/refresh
 Content-Type: {{contentType}}
@@ -92,3 +88,15 @@ Content-Type: {{contentType}}
   "refreshToken": "invalid.refresh.token"
 }
 
+### ========================================
+### 6. 로그아웃 테스트
+### ========================================
+
+### 6-1. 정상 로그아웃
+POST {{host}}/api/v1/auth/logout
+Content-Type: {{contentType}}
+Authorization: Bearer {{refreshToken}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}

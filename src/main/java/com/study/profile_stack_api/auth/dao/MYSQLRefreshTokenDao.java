@@ -22,10 +22,6 @@ public class MYSQLRefreshTokenDao implements RefreshTokenDao {
 
     /**
      * saveRefreshToken
-     *
-     * @param memberId
-     * @param token
-     * @param expiresAt
      */
     public void saveRefreshToken(Long memberId, String token, Timestamp expiresAt) {
         // First, delete any existing refresh tokens for this user
@@ -36,5 +32,14 @@ public class MYSQLRefreshTokenDao implements RefreshTokenDao {
         String insertSql = "INSERT INTO refresh_token (member_id, token, expiry_date) VALUES (?, ?, ?)";
         jdbcTemplate.update(insertSql, memberId, token, expiresAt);
         log.debug("Saved refresh token for user ID: {}", memberId);
+    }
+
+    /**
+     * Delete refresh token
+     */
+    public void deleteRefreshToken(String refreshToken) {
+        String sql = "DELETE FROM refresh_token WHERE token = ?";
+        jdbcTemplate.update(sql, refreshToken);
+        log.debug("Deleted refresh token");
     }
 }

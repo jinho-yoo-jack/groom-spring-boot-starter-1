@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface RefreshTokenDao {
 
     void saveRefreshToken(Long memberId, String token, Timestamp expiresAt);
+
+    void deleteRefreshToken(String refreshToken);
 }

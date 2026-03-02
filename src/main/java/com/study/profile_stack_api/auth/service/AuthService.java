@@ -117,6 +117,16 @@ public class AuthService {
     }
 
     /**
+     * Logout (invalidate refresh token)
+     */
+    @Transactional
+    public void logout(String refreshToken) {
+        log.info("Logout attempt");
+        refreshTokenDao.deleteRefreshToken(refreshToken);
+        log.info("Logout successful");
+    }
+
+    /**
      * Refresh access token using refresh token
      */
     @Transactional

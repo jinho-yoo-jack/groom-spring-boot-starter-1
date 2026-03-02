@@ -54,17 +54,6 @@ public class MySQLMemberDaoImpl implements MemberDao {
         return member;
     }
 
-    public void saveRefreshToken(Long memberId, String token, Timestamp expiresAt) {
-        // First, delete any existing refresh tokens for this user
-        String deleteSql = "DELETE FROM refresh_token WHERE member_id = ?";
-        jdbcTemplate.update(deleteSql, memberId);
-
-        // Insert new refresh token
-        String insertSql = "INSERT INTO refresh_token (member_id, token, expiry_date) VALUES (?, ?, ?)";
-        jdbcTemplate.update(insertSql, memberId, token, expiresAt);
-        log.debug("Saved refresh token for user ID: {}", memberId);
-    }
-
     // ====================== Read ======================
 
     @Override

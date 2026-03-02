@@ -1,12 +1,13 @@
 package com.study.profile_stack_api.auth.service;
 
 import com.study.profile_stack_api.auth.dao.MemberDao;
+import com.study.profile_stack_api.auth.dao.RefreshTokenDao;
 import com.study.profile_stack_api.auth.dto.request.LoginRequest;
-import com.study.profile_stack_api.auth.dto.request.RefreshTokenRequest;
+import com.study.profile_stack_api.auth.dto.request.TokenRefreshRequest;
 import com.study.profile_stack_api.auth.dto.request.SignupRequest;
 import com.study.profile_stack_api.auth.dto.response.LoginResponse;
 import com.study.profile_stack_api.auth.dto.response.SignupResponse;
-import com.study.profile_stack_api.auth.dto.response.TokenResponse;
+import com.study.profile_stack_api.auth.dto.response.TokenRefreshResponse;
 import com.study.profile_stack_api.auth.entity.Member;
 import com.study.profile_stack_api.auth.entity.MemberRole;
 import com.study.profile_stack_api.auth.exception.AuthException;
@@ -40,6 +41,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenDao refreshTokenDao;
 
     @Value("${jwt.access-token-validity}")
     private long accessTokenValidity;
@@ -97,7 +99,7 @@ public class AuthService {
 
             // 5. Refresh Token을 DB에 저장
             Date refreshTokenExpiry = jwtTokenProvider.getExpirationFromToken(refreshToken);
-            memberDao.saveRefreshToken(user.getId(), refreshToken, new Timestamp(refreshTokenExpiry.getTime()));
+            refreshTokenDao.saveRefreshToken(user.getId(), refreshToken, new Timestamp(refreshTokenExpiry.getTime()));
 
             log.info("Login successful for user: {}", user.getUsername());
 
@@ -118,7 +120,7 @@ public class AuthService {
      * Refresh access token using refresh token
      */
     @Transactional
-    public TokenResponse refresh(RefreshTokenRequest request) {
+    public TokenRefreshResponse refresh(TokenRefreshRequest request) {
         String refreshToken = request.getRefreshToken();
 
         log.info("Token refresh attempt");
@@ -147,14 +149,12 @@ public class AuthService {
 
         // Update refresh token in database
         Date refreshTokenExpiry = jwtTokenProvider.getExpirationFromToken(newRefreshToken);
-        memberDao.saveRefreshToken(member.getId(), newRefreshToken, new Timestamp(refreshTokenExpiry.getTime()));
+        refreshTokenDao.saveRefreshToken(member.getId(), newRefreshToken, new Timestamp(refreshTokenExpiry.getTime()));
 
         log.info("Token refreshed successfully for user: {}", member.getUsername());
 
-        return TokenResponse.of(
-                newAccessToken,
-                newRefreshToken,
-                accessTokenValidity
+        return TokenRefreshResponse.of(
+                newAccessToken
         );
     }
 }

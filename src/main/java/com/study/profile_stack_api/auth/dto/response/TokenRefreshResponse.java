@@ -13,22 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TokenResponse {
+public class TokenRefreshResponse {
 
     private String accessToken;
-    private String refreshToken;
-    private String tokenType;
-    private Long expiresIn; // in seconds
 
     /**
      * Create token response with default token type
      */
-    public static TokenResponse of(String accessToken, String refreshToken, Long expiresIn) {
-        return TokenResponse.builder()
+    public static TokenRefreshResponse of(String accessToken) {
+        return TokenRefreshResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .tokenType("Bearer")
-                .expiresIn(expiresIn)
                 .build();
     }
 }

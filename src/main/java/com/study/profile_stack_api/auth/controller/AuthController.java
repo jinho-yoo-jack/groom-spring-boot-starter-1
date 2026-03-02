@@ -1,11 +1,11 @@
 package com.study.profile_stack_api.auth.controller;
 
 import com.study.profile_stack_api.auth.dto.request.LoginRequest;
-import com.study.profile_stack_api.auth.dto.request.RefreshTokenRequest;
+import com.study.profile_stack_api.auth.dto.request.TokenRefreshRequest;
 import com.study.profile_stack_api.auth.dto.request.SignupRequest;
 import com.study.profile_stack_api.auth.dto.response.LoginResponse;
 import com.study.profile_stack_api.auth.dto.response.SignupResponse;
-import com.study.profile_stack_api.auth.dto.response.TokenResponse;
+import com.study.profile_stack_api.auth.dto.response.TokenRefreshResponse;
 import com.study.profile_stack_api.auth.service.AuthService;
 import com.study.profile_stack_api.global.common.ApiResponse;
 import jakarta.validation.Valid;
@@ -59,10 +59,10 @@ public class AuthController {
      * POST /api/auth/refresh
      */
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<TokenResponse>> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<ApiResponse<TokenRefreshResponse>> refresh(@Valid @RequestBody TokenRefreshRequest request) {
         log.info("Token refresh request");
 
-        TokenResponse response = authService.refresh(request);
+        TokenRefreshResponse response = authService.refresh(request);
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }

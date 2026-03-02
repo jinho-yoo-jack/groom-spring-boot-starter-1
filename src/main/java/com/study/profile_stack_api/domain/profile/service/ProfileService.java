@@ -2,10 +2,16 @@ package com.study.profile_stack_api.domain.profile.service;
 
 import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.global.common.Page;
+import com.study.profile_stack_api.global.exception.DuplicateEmailException;
+import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
+import com.study.profile_stack_api.global.exception.UnauthorizedException;
+import com.study.profile_stack_api.global.mapper.ProfileMapper;
+import com.study.profile_stack_api.global.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +25,7 @@ import java.util.stream.Collectors;
 public class ProfileService {
 
     private final ProfileDao profileDao;
+    private final ProfileMapper profileMapper;
 
     private static final int MAX_PAGE_SIZE = 100;
 
@@ -29,7 +36,19 @@ public class ProfileService {
      */
     public ProfileResponse save(ProfileRequest request) {
 
-        return ProfileResponse.from(profileDao.save(new Profile(request)));
+        Profile profile = profileMapper.toEntity(request);
+
+        profileDao.getEmail(request.getEmail())
+                .ifPresent(profileByEmail -> {
+                    throw new DuplicateEmailException(profile.getEmail());
+                });
+
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        profile.setMemberId(currentUserId);
+
+        Profile savedProfile =  profileDao.save(profile);
+
+        return profileMapper.toResponse(savedProfile);
     }
 
     // ================ READ ====================
@@ -48,7 +67,7 @@ public class ProfileService {
         Page<Profile> profilePage = profileDao.getAllProfiles(page, size, position, name);
 
         List<ProfileResponse> content = profilePage.getContent().stream()
-                .map(ProfileResponse::from)
+                .map(profileMapper::toResponse)
                 .collect(Collectors.toList());
 
         return new Page<>(content, page, size, profilePage.getTotalElements());
@@ -61,10 +80,9 @@ public class ProfileService {
      */
     public ProfileResponse getProfile(long id) {
 
-        Profile profile = profileDao.getProfile(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. (id : " + id + ")"));
-
-        return ProfileResponse.from(profile);
+        return profileDao.getProfile(id)
+                .map(profileMapper::toResponse)
+                .orElseThrow(() -> new ProfileNotFoundException(id));
     }
 
     /**
@@ -75,7 +93,7 @@ public class ProfileService {
     public List<ProfileResponse> searchProfileByPosition(String position) {
 
         return profileDao.searchProfileByPosition(position).stream()
-                .map(ProfileResponse::from)
+                .map(profileMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -83,26 +101,41 @@ public class ProfileService {
     /**
      * 프로필 수정
      * @param id
-     * @param profileRequest
+     * @param profileUpdateRequest
      * @return
      */
-    public ProfileResponse updateProfile(long id, ProfileRequest profileRequest) {
+    public ProfileResponse updateProfile(long id, ProfileUpdateRequest profileUpdateRequest) {
 
         Profile profile = profileDao.getProfile(id)
                 .orElseThrow(() -> new IllegalArgumentException("수정할 프로필이 없습니다. (id : " + id + ")"));
 
-        if (profileRequest.hasNoUpdates()) {
+        if (profileUpdateRequest.hasNoUpdates()) {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
 
-        return ProfileResponse.from(profileDao.updateProfile(profile.update(profileRequest)));
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        if (!currentUserId.equals(profile.getMemberId())) {
+            throw new UnauthorizedException("본인 프로필만 수정 가능합니다.");
+        }
+
+        profileMapper.partialUpdate(profileUpdateRequest, profile);
+        Profile savedProfile = profileDao.updateProfile(profile);
+
+        return profileMapper.toResponse(savedProfile);
     }
 
     // ================ DELETE ====================
     public ProfileDeleteResponse deleteProfileById(long id) {
 
         Profile profile = profileDao.getProfile(id)
-                .orElseThrow(() -> new IllegalArgumentException("삭제할 프로필이 없습니다. (id : " + id + ")"));
+                .orElseThrow(() -> new ProfileNotFoundException(id));
+
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        if (!currentUserId.equals(profile.getMemberId())) {
+            throw new UnauthorizedException("본인 프로필만 삭제 가능합니다.");
+        }
 
         profileDao.deleteProfileById(id);
 

@@ -1,5 +1,10 @@
 package com.study.profile_stack_api.domain.profile.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum Position {
     BACKEND("⚙️", "백엔드 개발자"),
     FRONTEND("🎨", "프론트엔드 개발자"),
@@ -10,22 +15,8 @@ public enum Position {
     AI("🤖", "AI/ML 엔지니어"),
     ETC("💻", "기타");
 
-    private String icon;
-    private String description;
-
-    Position(String icon, String description) {
-        this.icon = icon;
-        this.description = description;
-    }
-
-    // Getter
-    public String getIcon() {
-        return icon;
-    }
-
-    public String getDescription() {
-        return description;
-    }
+    private final String icon;
+    private final String description;
 
     // Null Check
     public static Position from(String description) {

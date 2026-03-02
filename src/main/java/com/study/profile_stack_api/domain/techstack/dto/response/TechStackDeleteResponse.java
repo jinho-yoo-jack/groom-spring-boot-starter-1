@@ -1,7 +1,10 @@
 package com.study.profile_stack_api.domain.techstack.dto.response;
 
-import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
+@NoArgsConstructor
 public class TechStackDeleteResponse {
 
     private String message;
@@ -13,15 +16,5 @@ public class TechStackDeleteResponse {
         TechStackDeleteResponse.deletedId = id;
 
         return TechStackDeleteResponse;
-    }
-
-    // Getter
-
-    public String getMessage() {
-        return message;
-    }
-
-    public long getDeletedId() {
-        return deletedId;
     }
 }

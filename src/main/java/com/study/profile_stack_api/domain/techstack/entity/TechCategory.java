@@ -1,5 +1,10 @@
 package com.study.profile_stack_api.domain.techstack.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum TechCategory {
     LANGUAGE("프로그래밍언어", "📝"),
     FRAMEWORK("프레임워크", "🏗️"),
@@ -8,20 +13,6 @@ public enum TechCategory {
     TOOL("개발도구", "🔧"),
     ETC("기타", "📦");
 
-    private String description;
-    private String icon;
-
-    TechCategory(String description, String icon) {
-        this.description = description;
-        this.icon = icon;
-    }
-
-    // Getter
-    public String getDescription() {
-        return description;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
+    private final String description;
+    private final String icon;
 }

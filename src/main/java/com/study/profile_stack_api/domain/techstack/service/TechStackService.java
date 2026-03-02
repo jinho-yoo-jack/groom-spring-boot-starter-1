@@ -1,12 +1,19 @@
 package com.study.profile_stack_api.domain.techstack.service;
 
 import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
+import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.techstack.dao.TechStackDao;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackRequest;
+import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
 import com.study.profile_stack_api.global.common.Page;
+import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
+import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
+import com.study.profile_stack_api.global.exception.UnauthorizedException;
+import com.study.profile_stack_api.global.mapper.TechStackMapper;
+import com.study.profile_stack_api.global.security.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +28,7 @@ public class TechStackService {
 
     private final TechStackDao techstackDao;
     private final ProfileDao profileDao;
+    private final TechStackMapper techStackMapper;
 
     private static final int MAX_PAGE_SIZE = 100;
 
@@ -33,13 +41,21 @@ public class TechStackService {
      */
     public TechStackResponse save(long profileId, TechStackRequest techstackRequest) {
 
-        profileDao.getProfile(profileId)
+        Profile profile = profileDao.getProfile(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. (id : " + profileId + ")"));
 
-        TechStack techStack = new TechStack(techstackRequest);
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        if (!currentUserId.equals(profile.getMemberId())) {
+            throw new UnauthorizedException("본인 기술스택만 입력 가능합니다.");
+        }
+
+        TechStack techStack = techStackMapper.toEntity(techstackRequest);
         techStack.setProfileId(profileId);
 
-        return TechStackResponse.from(techstackDao.save(techStack));
+        techstackDao.save(techStack);
+
+        return techStackMapper.toResponse(techStack);
     }
 
     //=============== READ ====================
@@ -65,7 +81,7 @@ public class TechStackService {
         Page<TechStack> techStackPage = techstackDao.getAllTechStacks(profileId, page, size, category, proficiency);
 
         List<TechStackResponse> content = techStackPage.getContent().stream()
-                                            .map(TechStackResponse::from)
+                                            .map(techStackMapper::toResponse)
                                             .collect(Collectors.toList());
 
         return new Page<>(content, page, size, techStackPage.getTotalElements());
@@ -80,44 +96,60 @@ public class TechStackService {
     public TechStackResponse getTechStack(long profileId, long id) {
 
         profileDao.getProfile(profileId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. (id : " + profileId + ")"));
+                .orElseThrow(() -> new ProfileNotFoundException(profileId));
 
         TechStack techStack = techstackDao.getTechStack(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 기술스택을 찾을 수 없습니다. (id : " + id + ")"));
+                .orElseThrow(() -> new TechStackNotFoundException(id));
 
-        return TechStackResponse.from(techStack);
+        return techStackMapper.toResponse(techStack);
     }
 
-    //=============== READ ====================
+    //=============== UPDATE ====================
 
     /**
      * 기술 스택 수정
      * @param profileId
      * @param id
-     * @param techStackRequest
+     * @param TechStackUpdateRequest
      * @return
      */
-    public TechStackResponse updateTechStack(long profileId, long id, TechStackRequest techStackRequest) {
-        profileDao.getProfile(profileId)
+    public TechStackResponse updateTechStack(long profileId, long id, TechStackUpdateRequest TechStackUpdateRequest) {
+        Profile profile = profileDao.getProfile(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. (id : " + profileId + ")"));
 
         TechStack techStack = techstackDao.getTechStack(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 기술스택을 찾을 수 없습니다. (id : " + id + ")"));
 
-        if (techStackRequest.hasNoUpdates()) {
+        if (TechStackUpdateRequest.hasNoUpdates()) {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
 
-        return TechStackResponse.from(techstackDao.updateTechStack(profileId, id, techStack.update(techStackRequest)));
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        if (!currentUserId.equals(profile.getMemberId())) {
+            throw new UnauthorizedException("본인 기술스택만 수정 가능합니다.");
+        }
+
+        techStackMapper.partialUpdate(TechStackUpdateRequest, techStack);
+        techstackDao.updateTechStack(profileId, id, techStack);
+
+        return techStackMapper.toResponse(techStack);
     }
 
 
     public TechStackDeleteResponse deleteTechStack(long profileId, long id) {
-        profileDao.getProfile(profileId)
+
+        Profile profile = profileDao.getProfile(profileId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. (id : " + profileId + ")"));
 
         techstackDao.getTechStack(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 기술스택을 찾을 수 없습니다. (id : " + id + ")"));
+
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        if (!currentUserId.equals(profile.getMemberId())) {
+            throw new UnauthorizedException("본인 기술스택만 삭제 가능합니다.");
+        }
 
         techstackDao.deleteTechStackById(id);
 

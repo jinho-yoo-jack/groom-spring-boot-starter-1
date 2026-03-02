@@ -1,18 +1,27 @@
 package com.study.profile_stack_api.domain.profile.controller;
 
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
+import com.study.profile_stack_api.global.common.ApiResponse;
 import com.study.profile_stack_api.global.common.Page;
+import jakarta.servlet.ServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/profiles")
 @RequiredArgsConstructor
+@Validated
 public class ProfileController {
 
     private final ProfileService profileService;
@@ -24,8 +33,14 @@ public class ProfileController {
      * POST /api/v1/profiles
      */
     @PostMapping
-    public ProfileResponse craeteProfile(@RequestBody ProfileRequest request) {
-        return profileService.save(request);
+    public  ResponseEntity<ApiResponse<ProfileResponse>> createProfile(
+            @Valid  @RequestBody ProfileRequest request,
+            ServletResponse servletResponse) {
+
+        return ResponseEntity
+                .ok()
+                .body(ApiResponse.success(profileService.save(request)));
+
     }
 
     // ================ READ ==================
@@ -57,8 +72,13 @@ public class ProfileController {
      * @return
      */
     @GetMapping("/{id}")
-    public ProfileResponse getProfile(@PathVariable long id) {
-        return profileService.getProfile(id);
+    public ResponseEntity<ApiResponse<ProfileResponse>> getProfile(
+            @PathVariable
+            @Positive(message = "{profile.id.positive}") long id) {
+
+        return ResponseEntity
+                .ok()
+                .body(ApiResponse.success(profileService.getProfile(id)));
     }
 
     /**
@@ -67,8 +87,11 @@ public class ProfileController {
      * @return
      */
     @GetMapping("/position/{position}")
-    public List<ProfileResponse> searchProfileByPosition(@PathVariable String position) {
-        return profileService.searchProfileByPosition(position);
+    public ResponseEntity<ApiResponse<List<ProfileResponse>>> searchProfileByPosition(@PathVariable String position) {
+        //return profileService.searchProfileByPosition(position);
+        return ResponseEntity
+                .ok()
+                .body(ApiResponse.success(profileService.searchProfileByPosition(position)));
     }
 
     // ================ UPDATE ==================
@@ -76,20 +99,23 @@ public class ProfileController {
     /**
      * 프로필 수정
      * @param id
-     * @param profileRequest
+     * @param ProfileUpdateRequest
      * @return
      */
     @PutMapping("/{id}")
     public ProfileResponse updateProfileByPosition(
             @PathVariable long id,
-            @RequestBody ProfileRequest profileRequest) {
+            @Valid @RequestBody ProfileUpdateRequest ProfileUpdateRequest) {
 
-        return profileService.updateProfile(id, profileRequest);
+        return profileService.updateProfile(id, ProfileUpdateRequest);
     }
 
     // ================ DELETE ==================
     @DeleteMapping("/{id}")
-    public ProfileDeleteResponse deleteProfileById(@PathVariable long id) {
-        return profileService.deleteProfileById(id);
+    public ResponseEntity<ApiResponse<ProfileDeleteResponse>> deleteProfileById(@PathVariable long id) {
+
+        return ResponseEntity
+                .ok()
+                .body(ApiResponse.success(profileService.deleteProfileById(id)));
     }
 }

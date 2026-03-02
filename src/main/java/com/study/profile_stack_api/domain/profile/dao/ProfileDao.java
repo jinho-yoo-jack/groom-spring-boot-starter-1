@@ -18,6 +18,7 @@ public interface ProfileDao {
 
     List<Profile> searchProfileByPosition(String position);
 
+    Optional<Profile> getEmail(String email);
     // ============ UPDATE ================
     Profile updateProfile(Profile profile);
 

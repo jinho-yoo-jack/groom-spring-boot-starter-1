@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class TechStatckDaoImpl implements TechStackDao {
+public class TechStackDaoImpl implements TechStackDao {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -37,8 +37,8 @@ public class TechStatckDaoImpl implements TechStackDao {
             PreparedStatement ps = connection.prepareStatement(sql, new String[]{"ID"});
             ps.setLong(1, techStack.getProfileId());
             ps.setString(2, techStack.getName());
-            ps.setString(3, techStack.getTechCategory().getDescription());
-            ps.setString(4, techStack.getProficency().getDescription());
+            ps.setString(3, techStack.getTechCategory().name());
+            ps.setString(4, techStack.getProficiency().name());
             ps.setInt(5, techStack.getYearsOfExp());
             ps.setTimestamp(6, Timestamp.valueOf(techStack.getCreatedAt()));
             ps.setTimestamp(7, Timestamp.valueOf(techStack.getUpdatedAt()));
@@ -69,8 +69,8 @@ public class TechStatckDaoImpl implements TechStackDao {
         }
 
         if (proficiency != null) {
-            countSql += " AND proficiency LIKE ?";
-            countParams.add("%" + proficiency + "%");
+            countSql += " AND proficiency = ?";
+            countParams.add(proficiency);
         }
 
         Long totalElements = jdbcTemplate.queryForObject(countSql, Long.class, countParams.toArray());
@@ -118,7 +118,7 @@ public class TechStatckDaoImpl implements TechStackDao {
         }
     }
 
-    //============== READ ===================
+    //============== UPDATE ===================
 
     @Override
     public TechStack updateTechStack(long profileId, long id, TechStack techStack) {
@@ -130,8 +130,8 @@ public class TechStatckDaoImpl implements TechStackDao {
 
         int updated = jdbcTemplate.update(sql,
                 techStack.getName(),
-                techStack.getTechCategory().getDescription(),
-                techStack.getProficency().getDescription(),
+                techStack.getTechCategory().name(),
+                techStack.getProficiency().name(),
                 techStack.getYearsOfExp(),
                 profileId,
                 id);
@@ -159,7 +159,7 @@ public class TechStatckDaoImpl implements TechStackDao {
         techStack.setProfileId(rs.getLong("profile_id"));
         techStack.setName(rs.getString("name"));
         techStack.setTechCategory(TechCategory.valueOf(rs.getString("category")));
-        techStack.setProficency(Proficiency.valueOf(rs.getString("proficiency")));
+        techStack.setProficiency(Proficiency.valueOf(rs.getString("proficiency")));
         techStack.setYearsOfExp(rs.getInt("years_of_exp"));
         techStack.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         techStack.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());

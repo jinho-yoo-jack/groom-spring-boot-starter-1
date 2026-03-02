@@ -1,5 +1,8 @@
 package com.study.profile_stack_api.domain.profile.dto.response;
 
+import lombok.Getter;
+
+@Getter
 public class ProfileDeleteResponse {
 
     private String message;
@@ -11,15 +14,5 @@ public class ProfileDeleteResponse {
         profileDeleteResponse.deletedId = id;
 
         return profileDeleteResponse;
-    }
-
-    //Getter
-
-    public String getMessage() {
-        return message;
-    }
-
-    public long getDeletedId() {
-        return deletedId;
     }
 }

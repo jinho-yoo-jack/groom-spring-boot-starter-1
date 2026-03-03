@@ -1,62 +1,86 @@
 package com.study.profile_stack_api.domain.profile.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
-import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.service.ProfileService;
 import com.study.profile_stack_api.global.common.ApiResponse;
 import com.study.profile_stack_api.global.common.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/profiles")
 public class ProfileController {
+
     private final ProfileService profileService;
 
     public ProfileController(ProfileService profileService) {
         this.profileService = profileService;
     }
 
-    // === Profile API ===
-    // GET
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProfileResponse>> getProfile(@PathVariable Long id) {
-        // service를 호출해서, id를 통해 Profile을 가져오기
-        ProfileResponse response = profileService.getProfileById(id);
-        return ResponseEntity.ok().body(ApiResponse.success(response));
-    }
-
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<ProfileResponse>>> getProfilesWithPaging(@RequestParam Integer page, @RequestParam Integer size) {
-        // service를 호출해서 page, size값을 전달하여 데이터 가져오기
-        Page<ProfileResponse> responses = profileService.getProfileWithPaging(page, size);
-        System.out.println(responses);
-        return ResponseEntity.ok().body(ApiResponse.success(responses));
+    public ResponseEntity<ApiResponse<Page<ProfileResponse>>> getProfiles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<ProfileResponse> result = profileService.getProfiles(page, size);
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
-    // POST
+    @GetMapping("/position")
+    public ResponseEntity<ApiResponse<Page<ProfileResponse>>> getProfilesByPosition(
+            @RequestParam String position,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<ProfileResponse> result = profileService.getProfilesByPosition(position, page, size);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<ProfileResponse>>> searchProfiles(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<ProfileResponse> result = profileService.searchProfilesByName(name, page, size);
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProfileResponse>> getProfile(@PathVariable(name = "id") Long id) {
+        ProfileResponse profile = profileService.getProfile(id);
+        return ResponseEntity.ok(ApiResponse.success(profile));
+    }
+
     @PostMapping
-    public ResponseEntity<ApiResponse<ProfileResponse>> createProfile(@RequestBody ProfileCreateRequest request) {
-        ProfileResponse response = profileService.createProfile(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(response));
+    public ResponseEntity<ApiResponse<ProfileResponse>> createProfile(
+            @RequestBody ProfileCreateRequest request) {
+        ProfileResponse profile = profileService.createProfile(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created(profile));
     }
 
-    // PUT
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProfileResponse>> updateProfile(@PathVariable Long id,  @RequestBody ProfileUpdateRequest request) {
-        ProfileResponse response = profileService.updateProfileById(id, request);
-        return ResponseEntity.ok().body(ApiResponse.success(response));
+    public ResponseEntity<ApiResponse<ProfileResponse>> updateProfile(
+            @PathVariable(name = "id") Long id,
+            @RequestBody ProfileUpdateRequest request) {
+        ProfileResponse profile = profileService.updateProfile(id, request);
+        return ResponseEntity.ok(ApiResponse.success(profile));
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProfileDeleteResponse>> deleteProfile(@PathVariable Long id) {
-        ProfileDeleteResponse response = profileService.deleteProfileById(id);
-        return ResponseEntity.ok().body(ApiResponse.success(response));
+    public ResponseEntity<Void> deleteProfile(
+            @PathVariable(name = "id") Long id) {
+        profileService.deleteProfile(id);
+        return ResponseEntity.noContent().build();
     }
+
 }

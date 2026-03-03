@@ -6,22 +6,19 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ApiResponse<T> {
-    // success: 처리 성공 여부
-    // code: 응답 코드
-    // message: 응답 메세지
-    // data: 응답 데이터
-    private boolean success;
-    private String code;
+    private int status;
     private String message;
     private T data;
 
-    // 성공
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, "OK", null, data);
+        return new ApiResponse<T>(200, "성공", data);
     }
 
-    // 실패
-    public static <T> ApiResponse<T> error(String code, String message) {
-        return new ApiResponse<>(false, code, message, null);
+    public static <T> ApiResponse<T> created(T data) {
+        return new ApiResponse<T>(201, "생성 완료", data);
+    }
+
+    public static <T> ApiResponse<T> error(int status, String message) {
+        return new ApiResponse<T>(status, message, null);
     }
 }

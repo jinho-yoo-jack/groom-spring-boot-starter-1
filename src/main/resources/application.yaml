@@ -1,26 +1,28 @@
-# 서버 설정
-server:
-  port: 8080
-  servlet:
-    context-path: /
-
 spring:
   application:
-    name: dev-info
+    name: profile-stack-api
 
-  profiles:
-    active: dev
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
 
-  servlet:
-    encoding:
-      charset: UTF-8
+  h2:
+    console:
       enabled: true
-      force: true
+      path: /h2-console
 
-# 로깅 설정(공통)
-logging:
-  level:
-    root: INFO
-    com.study.myspringstudydiary: DEBUG
-    org.springframework.jdbc: DEBUG
-    com.zaxxer.hikari: DEBUG
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql

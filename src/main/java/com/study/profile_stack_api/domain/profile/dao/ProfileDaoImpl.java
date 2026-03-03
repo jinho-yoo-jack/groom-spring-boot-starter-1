@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
+import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
 
 @Repository
 public class ProfileDaoImpl implements ProfileDao {
@@ -55,7 +56,7 @@ public class ProfileDaoImpl implements ProfileDao {
         }, keyHolder);
 
         Long generatedId = ((Number) keyHolder.getKeys().get("ID")).longValue();
-        return findById(generatedId).orElseThrow();
+        return findById(generatedId).orElseThrow(() -> new ProfileNotFoundException(generatedId));
     }
 
     @Override
@@ -95,9 +96,8 @@ public class ProfileDaoImpl implements ProfileDao {
                 profile.getCareerYears(),
                 profile.getGithubUrl(),
                 profile.getBlogUrl(),
-                profile.getId() // WHERE id = ? ← 마지막!
-        );
-        return findById(profile.getId()).orElseThrow();
+                profile.getId());
+        return findById(profile.getId()).orElseThrow(() -> new ProfileNotFoundException(profile.getId()));
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import com.study.profile_stack_api.domain.techstack.entity.Category;
 import com.study.profile_stack_api.domain.techstack.entity.Proficiency;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
 
 @Repository
 public class TechStackDaoImpl implements TechStackDao {
@@ -52,7 +53,7 @@ public class TechStackDaoImpl implements TechStackDao {
         }, keyHolder);
 
         Long generatedId = ((Number) keyHolder.getKeys().get("ID")).longValue();
-        return findById(generatedId).orElseThrow();
+        return findById(generatedId).orElseThrow(() -> new TechStackNotFoundException(generatedId));
     }
 
     @Override
@@ -77,7 +78,7 @@ public class TechStackDaoImpl implements TechStackDao {
                 techStack.getProficiency().name(),
                 techStack.getYearsOfExp(),
                 techStack.getId());
-        return findById(techStack.getId()).orElseThrow();
+        return findById(techStack.getId()).orElseThrow(() -> new TechStackNotFoundException(techStack.getId()));
     }
 
     @Override

@@ -8,13 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/tech_stacks")
+@RequestMapping("/api/v1/{profileId}/tech-stacks")
 @RequiredArgsConstructor
 @Validated
 public class TechStackController {
@@ -22,10 +21,30 @@ public class TechStackController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<TechStackResponse>> createTechStack(
-            @RequestBody TechStackCreateRequest request) {
-        TechStackResponse response = techStackService.createTechStack(request);
+            @RequestBody TechStackCreateRequest request,
+            @PathVariable Long profileId) {
+        TechStackResponse response = techStackService.createTechStack(request, profileId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<TechStackResponse>>> getAllTechStacks(
+            @PathVariable Long profileId) {
+        List<TechStackResponse> responses = techStackService.getAllTechStacks(profileId);
+
+        return ResponseEntity.ok()
+                .body(ApiResponse.success(responses));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<TechStackResponse>> getTechStacksById(
+            @PathVariable Long profileId,
+            @PathVariable Long id ) {
+        TechStackResponse response = techStackService.getTechStackById(profileId, id);
+
+        return ResponseEntity.ok()
                 .body(ApiResponse.success(response));
     }
 }

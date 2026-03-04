@@ -29,7 +29,7 @@ public class ProfileService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .bio(request.getBio())
-                .position(Position.valueOf(request.getPosition()))
+                .position(Position.valueOf(request.getPosition().toUpperCase()))
                 .careerYears(request.getCareerYears())
                 .githubUrl(request.getGithubUrl())
                 .blogUrl(request.getBlogUrl())
@@ -92,7 +92,7 @@ public class ProfileService {
                 request.getName(),
                 request.getEmail(),
                 request.getBio(),
-                Position.valueOf(request.getPosition()),
+                position,
                 request.getCareerYears(),
                 request.getGithubUrl(),
                 request.getBlogUrl()

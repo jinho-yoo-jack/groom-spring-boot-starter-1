@@ -13,6 +13,8 @@ public class ProfileDeleteResponse {
     private final String message = "프로필이 정상적으로 삭제되었습니다";
 
     public static ProfileDeleteResponse of(Long id) {
-        return new ProfileDeleteResponse(id);
+        return ProfileDeleteResponse.builder()
+                .id(id)
+                .build();
     }
 }

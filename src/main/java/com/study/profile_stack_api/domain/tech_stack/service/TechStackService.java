@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.tech_stack.service;
 
 import com.study.profile_stack_api.domain.tech_stack.dao.TechStackDao;
 import com.study.profile_stack_api.domain.tech_stack.dto.request.TechStackCreateRequest;
+import com.study.profile_stack_api.domain.tech_stack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.tech_stack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.tech_stack.entity.Category;
 import com.study.profile_stack_api.domain.tech_stack.entity.Proficiency;
@@ -20,15 +21,15 @@ public class TechStackService {
     private final TechStackDao techStackDao;
 
     // Create
-    public TechStackResponse createTechStack(TechStackCreateRequest request) {
-        validationCreateRequest(request);
+    public TechStackResponse createTechStack(TechStackCreateRequest request, Long profileId) {
+        validationCreateRequest(request, profileId);
 
         TechStack techStack = TechStack.builder()
                 .id(null)
-                .profileId(request.getProfileId())
+                .profileId(profileId)
                 .name(request.getName())
-                .category(Category.valueOf(request.getCategory()))
-                .proficiency(Proficiency.valueOf(request.getProficiency()))
+                .category(Category.valueOf(request.getCategory().toUpperCase()))
+                .proficiency(Proficiency.valueOf(request.getProficiency().toUpperCase()))
                 .yearsOfExp(request.getYearsOfExp())
                 .build();
 
@@ -38,18 +39,29 @@ public class TechStackService {
     }
 
     // Read
-    public List<TechStackResponse> getAllTechStacks() {
-        List<TechStack> techStacks = techStackDao.findAll();
+    public List<TechStackResponse> getAllTechStacks(Long profileId) {
+        List<TechStack> techStacks = techStackDao.findAll(profileId);
 
         return techStacks.stream()
                 .map(TechStackResponse::from)
                 .collect(Collectors.toList());
     }
 
+    public TechStackResponse getTechStackById(Long profileId, Long id) {
+        TechStack techStack = techStackDao.findTechStackById(profileId, id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로필 번호 혹은 ID : " + profileId + ", " + id));
+
+        return TechStackResponse.from(techStack);
+    }
+
+    // Update
+    public TechStack updateTechStack(Long id, TechStackUpdateRequest request) {
+        return null;
+    }
 
     // Validation
-    public void validationCreateRequest(TechStackCreateRequest request) {
-        if (request.getProfileId() == null || request.getProfileId() <= 0) {
+    public void validationCreateRequest(TechStackCreateRequest request, Long profileId) {
+        if (profileId == null || profileId <= 0) {
             throw new IllegalArgumentException("올바른 프로필 ID를 입력하세요");
         }
         if (request.getName() == null || request.getName().trim().isEmpty()) {

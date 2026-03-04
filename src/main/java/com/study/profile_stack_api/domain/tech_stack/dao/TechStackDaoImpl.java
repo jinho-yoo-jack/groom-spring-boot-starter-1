@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class TechStackDaoImpl implements TechStackDao{
@@ -34,7 +35,7 @@ public class TechStackDaoImpl implements TechStackDao{
 
         jdbcTemplate.update(connect -> {
             PreparedStatement ps = connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, techStack.getId());
+            ps.setLong(1, techStack.getProfileId());
             ps.setString(2, techStack.getName());
             ps.setString(3, techStack.getCategory().name());
             ps.setString(4, techStack.getProficiency().name());
@@ -53,14 +54,37 @@ public class TechStackDaoImpl implements TechStackDao{
     }
 
     @Override
-    public List<TechStack> findAll() {
+    public List<TechStack> findAll(Long profileId) {
         String sql = """
                 select *
                 from tech_stack
+                where profile_id = ?
                 order by id desc
                 """;
 
-        return jdbcTemplate.query(sql, techStackRowMapper);
+        return jdbcTemplate.query(sql, techStackRowMapper, profileId);
+    }
+
+    @Override
+    public Optional<TechStack> findTechStackById(Long profileId, Long id) {
+        String sql = """
+                select *
+                from tech_stack
+                where profile_id = ?
+                and id = ?
+                """;
+
+        try {
+            TechStack techStack = jdbcTemplate.queryForObject(sql, techStackRowMapper, profileId, id);
+            return Optional.ofNullable(techStack);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public TechStackDao update(TechStack techStack) {
+        return null;
     }
 
     public RowMapper<TechStack> techStackRowMapper = (rs, rowNum) -> {

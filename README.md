@@ -205,32 +205,32 @@ curl -X POST http://localhost:8080/api/v1/profiles/1/tech-stacks \
 ## 구현 체크리스트
 
 ### Phase 1: 기본 설정
-- [ ] Spring Boot 프로젝트 설정
-- [ ] application.yml 작성
-- [ ] schema.sql, data.sql 작성
-- [ ] H2 Console 연결 확인
+- [x] Spring Boot 프로젝트 설정
+- [x] application.yml 작성
+- [x] schema.sql, data.sql 작성
+- [x] MySQL 연결 확인
 
 ### Phase 2: 공통 모듈
-- [ ] ApiResponse 클래스 구현
+- [x] ApiResponse 클래스 구현
 - [ ] Page 클래스 구현
-- [ ] BusinessException 및 하위 예외 클래스 구현
-- [ ] GlobalExceptionHandler 구현
+- [x] BusinessException 및 하위 예외 클래스 구현
+- [x] GlobalExceptionHandler 구현
 
 ### Phase 3: Profile CRUD
-- [ ] Profile Entity 및 Enum 구현
-- [ ] Profile DTO 구현
-- [ ] ProfileDao 인터페이스 및 구현체
-- [ ] ProfileRepository 구현
-- [ ] ProfileService 구현
-- [ ] ProfileController 구현
+- [x] Profile Entity 및 Enum 구현
+- [x] Profile DTO 구현
+- [x] ProfileDao 인터페이스 및 구현체
+- [x] ProfileRepository 구현 -> 현재는 DAO가 대체 중
+- [x] ProfileService 구현
+- [x] ProfileController 구현
 
 ### Phase 4: TechStack CRUD
-- [ ] TechStack Entity 및 Enum 구현
-- [ ] TechStack DTO 구현
-- [ ] TechStackDao 인터페이스 및 구현체
-- [ ] TechStackRepository 구현
-- [ ] TechStackService 구현
-- [ ] TechStackController 구현
+- [x] TechStack Entity 및 Enum 구현
+- [x] TechStack DTO 구현
+- [x] TechStackDao 인터페이스 및 구현체
+- [x] TechStackRepository 구현 -> TechStackDao로 대체
+- [x] TechStackService 구현
+- [x] TechStackController 구현
 
 ### Phase 5: 페이징 & 검색
 - [ ] 프로필 페이징 구현

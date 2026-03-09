@@ -55,14 +55,14 @@ class TechStackDaoPagingTest {
             TechCategory category = i % 2 == 0 ? TechCategory.LANGUAGE : TechCategory.FRAMEWORK;
             Proficiency proficiency = i % 3 == 0 ? Proficiency.ADVANCED : Proficiency.INTERMEDIATE;
 
-            TechStack techStack = new TechStack(
-                    null,
-                    profileId,
-                    "기술 " + i,
-                    category,
-                    proficiency,
-                    i % 10
-            );
+            TechStack techStack = TechStack.builder()
+                    .id(null)
+                    .profileId(profileId)
+                    .name("기술 " + i)
+                    .category(category)
+                    .proficiency(proficiency)
+                    .yearsOfExp(i % 10)
+                    .build();
 
             techStackDao.saveByProfileId(profileId, techStack);
         }

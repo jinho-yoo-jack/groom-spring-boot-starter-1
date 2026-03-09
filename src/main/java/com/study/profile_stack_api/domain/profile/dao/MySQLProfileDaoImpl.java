@@ -322,18 +322,17 @@ public class MySQLProfileDaoImpl implements ProfileDao {
     /**
      * ResultSet의 각 행을 Profile 객체로 변환
      */
-    private final RowMapper<Profile> profileRowMapper = (rs, rowMapper) -> {
-        Profile profile = new Profile();
-        profile.setId(rs.getLong("id"));
-        profile.setName(rs.getString("name"));
-        profile.setEmail(rs.getString("email"));
-        profile.setBio(rs.getString("bio"));
-        profile.setPosition(Position.valueOf(rs.getString("position")));
-        profile.setCareerYears(rs.getInt("career_years"));
-        profile.setGithubUrl(rs.getString("github_url"));
-        profile.setBlogUrl(rs.getString("blog_url"));
-        profile.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        profile.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-        return profile;
-    };
+    private final RowMapper<Profile> profileRowMapper = (rs, rowMapper) ->
+            Profile.builder()
+                    .id(rs.getLong("id"))
+                    .name(rs.getString("name"))
+                    .email(rs.getString("email"))
+                    .bio(rs.getString("bio"))
+                    .position(Position.valueOf(rs.getString("position")))
+                    .careerYears(rs.getInt("career_years"))
+                    .githubUrl(rs.getString("github_url"))
+                    .blogUrl(rs.getString("blog_url"))
+                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                    .updatedAt(rs.getTimestamp("updated_at").toLocalDateTime())
+                    .build();
 }

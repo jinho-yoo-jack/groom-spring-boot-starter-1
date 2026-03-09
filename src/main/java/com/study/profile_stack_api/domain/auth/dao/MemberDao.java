@@ -19,6 +19,8 @@ public interface MemberDao {
 
     Optional<Member> findByUsername(String username);
 
+    Optional<Member> findByRefreshToken(String refreshToken);
+
     // ==================== UPDATE ====================
 
     int update(Member member);

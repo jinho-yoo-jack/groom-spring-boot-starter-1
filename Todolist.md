@@ -93,16 +93,16 @@
 - [x]  `Role` Enum 작성 (`USER`, `ADMIN`)
 - [x]  `RefreshToken` Entity 작성
 - [x]  `MemberDao` 인터페이스 및 구현체 작성
-- [ ]  `RefreshTokenDao` 인터페이스 및 구현체 작성 (`save`, `findByMemberId`, `deleteByMemberId`)
-- [ ]  `CustomUserDetailsService` 구현 (`UserDetailsService` 구현체)
-- [ ]  `PasswordEncoder` Bean 등록 (`BCryptPasswordEncoder`)
-- [ ]  `SignupRequest` 작성 (Bean Validation 적용)
-- [ ]  `LoginRequest`, `TokenRefreshRequest` 작성
-- [ ]  `LoginResponse` (accessToken + refreshToken), `TokenRefreshResponse` (accessToken) 작성
+- [x]  `RefreshTokenDao` 인터페이스 및 구현체 작성 (`save`, `findByMemberId`, `deleteByMemberId`)
+- [x]  `CustomUserDetailsService` 구현 (`UserDetailsService` 구현체)
+- [x]  `PasswordEncoder` Bean 등록 (`BCryptPasswordEncoder`)
+- [x]  `SignupRequest` 작성 (Bean Validation 적용)
+- [x]  `LoginRequest`, `TokenRefreshRequest` 작성
+- [x]  `LoginResponse` (accessToken + refreshToken), `TokenRefreshResponse` (accessToken) 작성
 
 ### Phase 5: Spring Security — JWT 필터 및 설정
 
-- [ ]  `JwtTokenProvider` 구현 (`createAccessToken`, `createRefreshToken`, `getUsername`, `validateToken`)
+- [x]  `JwtTokenProvider` 구현 (`createAccessToken`, `createRefreshToken`, `getUsername`, `validateToken`)
 - [ ]  `JwtAuthenticationFilter` 구현 (`OncePerRequestFilter` 상속, `shouldNotFilter()` 오버라이드)
 - [ ]  `JwtAuthenticationEntryPoint` 구현 (토큰 에러 분기: `TOKEN_EXPIRED`, `INVALID_TOKEN`, `UNAUTHORIZED`)
 - [ ]  `SecurityConfig` 작성

@@ -36,7 +36,7 @@ public class MySQLMemberDaoImpl implements MemberDao {
      */
     @Override
     public Member save(Member member) {
-        String sql = "INSERT INTO member (username, passsword, role, enabled) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO member (username, password, role, enabled) VALUES (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -46,7 +46,7 @@ public class MySQLMemberDaoImpl implements MemberDao {
             ps.setString(2, member.getPassword());
 
             Role role = member.getRole() != null ? member.getRole() : Role.USER;
-            ps.setString(3, role.name());
+            ps.setString(3, "ROLE_" + role.name());
 
             ps.setBoolean(4, member.isEnabled());
 
@@ -103,6 +103,30 @@ public class MySQLMemberDaoImpl implements MemberDao {
         }
     }
 
+    /**
+     * Refresh Token으로 회원 단건 조회
+     *
+     * @param refreshToken 조회할 회원의 Refresh Token
+     * @return 회원 (없다면 Null)
+     */
+    @Override
+    public Optional<Member> findByRefreshToken(String refreshToken) {
+        String sql = """
+                SELECT m.* FROM member m
+                INNER JOIN refresh_token rt ON m.id = rt.member_id
+                WHERE rt.token = ? AND rt.expiry_date > NOW()
+                """;
+
+        try {
+            Member member = jdbcTemplate.queryForObject(sql, memberRowMapper, refreshToken);
+            log.debug("Found member by refresh token");
+            return Optional.ofNullable(member);
+        } catch (EmptyResultDataAccessException e) {
+            log.debug("No member found with valid refresh token");
+            return Optional.empty();
+        }
+    }
+
     // ==================== UPDATE ====================
 
     /**
@@ -112,7 +136,7 @@ public class MySQLMemberDaoImpl implements MemberDao {
     public int update(Member member) {
         String sql = "UPDATE member SET username = ?, password = ?, role = ?, enabled = ? WHERE id = ?";
 
-        String roleStr = member.getRole() != null ? member.getRole().name() : "USER";
+        String roleStr = member.getRole() != null ? "ROLE_" + member.getRole().name() : "ROLE_USER";
 
         int rowsAffected = jdbcTemplate.update(sql,
                 member.getUsername(),
@@ -168,6 +192,9 @@ public class MySQLMemberDaoImpl implements MemberDao {
         Role role = Role.USER;
 
         if (roleStr != null) {
+            if (roleStr.startsWith("ROLE_")) {
+                roleStr = roleStr.substring(5);
+            }
             try {
                 role = Role.valueOf(roleStr);
             } catch (IllegalArgumentException e) {

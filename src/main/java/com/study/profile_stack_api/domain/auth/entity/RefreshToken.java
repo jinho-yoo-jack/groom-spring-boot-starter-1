@@ -13,6 +13,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class RefreshToken {
-    private String refreshToken;
-    private LocalDateTime refreshTokenExpiryDate;
+    private Long id;
+    private Long member_id;
+    private String token;
+    private LocalDateTime expiry_date;
+    private LocalDateTime created_at;
 }

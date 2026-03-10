@@ -41,13 +41,13 @@ public class JwtTokenProvider {
     /**
      * username과 role을 기반으로 Access Token 생성
      */
-    public String createAccessToken(String username, String role) {
+    public String createAccessToken(String username, String roles) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
                 .subject(username)
-                .claim("role", role)
+                .claim("roles", roles)
                 .claim("type", "access")
                 .issuedAt(now)
                 .expiration(expiryDate)

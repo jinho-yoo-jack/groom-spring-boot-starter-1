@@ -205,38 +205,63 @@ curl -X POST http://localhost:8080/api/v1/profiles/1/tech-stacks \
 ## 구현 체크리스트
 
 ### Phase 1: 기본 설정
-- [ ] Spring Boot 프로젝트 설정
-- [ ] application.yml 작성
-- [ ] schema.sql, data.sql 작성
-- [ ] H2 Console 연결 확인
+- [x] Spring Boot 프로젝트 설정
+- [x] application.yml 작성
+- [x] schema.sql, data.sql 작성
+- [x] MySQL 연결 확인
 
 ### Phase 2: 공통 모듈
-- [ ] ApiResponse 클래스 구현
-- [ ] Page 클래스 구현
-- [ ] BusinessException 및 하위 예외 클래스 구현
-- [ ] GlobalExceptionHandler 구현
+- [x] ApiResponse 클래스 구현
+- [x] Page 클래스 구현
+- [x] BusinessException 및 하위 예외 클래스 구현
+- [x] GlobalExceptionHandler 구현
 
 ### Phase 3: Profile CRUD
-- [ ] Profile Entity 및 Enum 구현
-- [ ] Profile DTO 구현
-- [ ] ProfileDao 인터페이스 및 구현체
-- [ ] ProfileRepository 구현
-- [ ] ProfileService 구현
-- [ ] ProfileController 구현
+- [x] Profile Entity 및 Enum 구현
+- [x] Profile DTO 구현
+- [x] ProfileDao 인터페이스 및 구현체
+- [x] ProfileRepository 구현 -> 현재는 DAO가 대체 중
+- [x] ProfileService 구현
+- [x] ProfileController 구현
 
 ### Phase 4: TechStack CRUD
-- [ ] TechStack Entity 및 Enum 구현
-- [ ] TechStack DTO 구현
-- [ ] TechStackDao 인터페이스 및 구현체
-- [ ] TechStackRepository 구현
-- [ ] TechStackService 구현
-- [ ] TechStackController 구현
+- [x] TechStack Entity 및 Enum 구현
+- [x] TechStack DTO 구현
+- [x] TechStackDao 인터페이스 및 구현체
+- [x] TechStackRepository 구현 -> TechStackDao로 대체
+- [x] TechStackService 구현
+- [x] TechStackController 구현
 
 ### Phase 5: 페이징 & 검색
-- [ ] 프로필 페이징 구현
-- [ ] 프로필 검색 기능 구현
-- [ ] 기술 스택 페이징 구현
-- [ ] 기술 스택 필터링 구현
+- [x] 프로필 페이징 구현
+- [x] 프로필 검색 기능 구현
+- [x] 기술 스택 페이징 구현
+- [ ] 기술 스택 필터링 구현 -> 특정 Profile에서 TeckStack을 필터링 해야하는건지..?
+
+### Phase 6: 어노테이션 기반 코드 최적화 (Lombok)
+- [ ] build.gradle에 Lombok 및 MapStruct 의존성 추가
+- [ ] Profile, TechStack 엔티티의 Getter/Setter, 생성자 제거 및 @Getter, @NoArgsConstructor(access = AccessLevel.PROTECTED) 등 적용
+- [ ] 모든 DTO에 @Getter, @Builder, @AllArgsConstructor 적용으로 보일러플레이트 코드 제거
+- [ ] 컨트롤러 및 서비스 레이어에 @Slf4j 적용하여 로그 시스템 통합
+
+### Phase 7: 선언적 유효성 검증 (Bean Validation)
+- [ ] spring-boot-starter-validation 추가
+- [ ] Request DTO 필드에 @NotBlank, @NotNull, @Size, @Email 등 적절한 어노테이션 선언
+- [ ] @RequestBody 앞에 @Valid 어노테이션 추가하여 자동 검증 활성화
+- [ ] MethodArgumentNotValidException을 GlobalExceptionHandler에서 잡아 ApiResponse 형식으로 반환하도록 수정
+
+### Phase 8: 객체 매핑 자동화 (MapStruct)
+- [ ] ProfileMapper, TechStackMapper 인터페이스 생성
+- [ ] @Mapper(componentModel = "spring")를 사용하여 Entity ↔ DTO 간 변환 로직 자동 생성
+- [ ] 수동으로 new 생성자나 빌더를 호출하던 코드를 mapper.toEntity() 또는 mapper.toResponse() 호출로 변경
+- [ ] List 형태의 객체 변환 로직 통합 및 테스트
+
+### Phase 9: 보안 및 인증/인가 (Spring Security)
+- [ ] SecurityFilterChain 빈 등록 및 기본적인 허용 경로(PermitAll) 설정
+- [ ] 로그인 기능 및 JWT(또는 Session) 기반의 인증 시스템 구축
+- [ ] GET 메서드(조회) 누구나 접근 가능하도록 설정
+- [ ] POST, PUT, DELETE: Authenticated 사용자만 접근 가능하도록 @PreAuthorize 또는 설정 파일 기반 권한 제어 적용
+- [ ] 생성/수정 시 현재 로그인한 사용자의 정보를 자동으로 주입하도록 로직 수정
 
 ## 아키텍처
 
@@ -256,7 +281,7 @@ Database (H2/MySQL)
 ### 패키지 구조
 - `domain`: 도메인별 기능 구현
     - `profile`: 프로필 관련 기능
-    - `techstack`: 기술 스택 관련 기능
+    - `techStack`: 기술 스택 관련 기능
 - `global`: 공통 기능
     - `common`: 공통 응답 객체
     - `exception`: 예외 처리

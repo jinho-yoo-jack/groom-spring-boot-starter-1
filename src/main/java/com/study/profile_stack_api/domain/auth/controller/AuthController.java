@@ -78,7 +78,7 @@ public class AuthController {
      * POST /api/v1/auth/refresh
      */
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<TokenRefreshResponse>> signup(
+    public ResponseEntity<ApiResponse<TokenRefreshResponse>> refresh(
             @Valid
             @RequestBody
             TokenRefreshRequest request

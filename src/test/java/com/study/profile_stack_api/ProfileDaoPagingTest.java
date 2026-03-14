@@ -1,5 +1,7 @@
 package com.study.profile_stack_api;
 
+import com.study.profile_stack_api.domain.auth.entity.Member;
+import com.study.profile_stack_api.domain.auth.entity.Role;
 import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
@@ -26,6 +28,13 @@ class ProfileDaoPagingTest {
         // 기존 데이터 초기화 후 테스트 데이터 생성
         profileDao.deleteAll();
 
+        Member member = Member.builder()
+                .id(1L)
+                .username("테스트")
+                .password("테스트")
+                .role(Role.USER)
+                .build();
+
         // 테스트용 프로필 25건 생성
         for (int i = 1; i <= 25; i++) {
             Position position = i % 2 == 0 ? Position.BACKEND
@@ -34,6 +43,7 @@ class ProfileDaoPagingTest {
 
             Profile profile = new Profile();
             profile.setName("이름 " + i);
+            profile.setMemberId(1L);
             profile.setEmail("test" + i + "@test.com");
             profile.setBio("내용 " + i);
             profile.setPosition(position);

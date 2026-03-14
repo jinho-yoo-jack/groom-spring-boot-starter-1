@@ -2,8 +2,9 @@ package com.study.profile_stack_api.domain.profile.dao;
 
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
-import com.study.profile_stack_api.global.common.Page;
 import com.study.profile_stack_api.domain.profile.exception.ProfileNotFoundException;
+import com.study.profile_stack_api.global.common.Page;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -20,12 +21,9 @@ import java.util.Optional;
  * MySQL 기반 Profile DAO 구현
  */
 @Repository
+@RequiredArgsConstructor
 public class MySQLProfileDaoImpl implements ProfileDao {
     public final JdbcTemplate jdbcTemplate;
-
-    public MySQLProfileDaoImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     // ==================== CREATE ====================
 
@@ -39,8 +37,8 @@ public class MySQLProfileDaoImpl implements ProfileDao {
     public Profile save(Profile profile) {
         String sql = """
                 INSERT INTO profile
-                (name, email, bio, position, career_years, github_url, blog_url)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                (name, email, bio, position, career_years, github_url, blog_url, member_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -54,6 +52,7 @@ public class MySQLProfileDaoImpl implements ProfileDao {
             ps.setInt(5, profile.getCareerYears());
             ps.setString(6, profile.getGithubUrl());
             ps.setString(7, profile.getBlogUrl());
+            ps.setLong(8, profile.getMemberId());
             return ps;
         }, keyHolder);
 
@@ -89,6 +88,23 @@ public class MySQLProfileDaoImpl implements ProfileDao {
         String sql = "SELECT * FROM profile WHERE id = ?";
         try {
             Profile profile = jdbcTemplate.queryForObject(sql, profileRowMapper, id);
+            return Optional.ofNullable(profile);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * 회원 ID로 프로필 단건 조회
+     *
+     * @param memberId 조회할 프로필 ID
+     * @return 프로필 (없다면 Null)
+     */
+    @Override
+    public Optional<Profile> findByMemberId(Long memberId) {
+        String sql = "SELECT * FROM profile WHERE member_id = ?";
+        try {
+            Profile profile = jdbcTemplate.queryForObject(sql, profileRowMapper, memberId);
             return Optional.ofNullable(profile);
         } catch (Exception e) {
             return Optional.empty();
@@ -325,6 +341,7 @@ public class MySQLProfileDaoImpl implements ProfileDao {
     private final RowMapper<Profile> profileRowMapper = (rs, rowMapper) ->
             Profile.builder()
                     .id(rs.getLong("id"))
+                    .memberId(rs.getLong("member_id"))
                     .name(rs.getString("name"))
                     .email(rs.getString("email"))
                     .bio(rs.getString("bio"))

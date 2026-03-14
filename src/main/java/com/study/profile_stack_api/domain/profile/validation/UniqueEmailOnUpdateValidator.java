@@ -14,10 +14,22 @@ public class UniqueEmailOnUpdateValidator implements ConstraintValidator<UniqueE
 
     private final ProfileDao profileDao;
 
+    /**
+     * 수정 요청용 이메일 중복 검증기 생성
+     *
+     * @param profileDao 프로필 조회 DAO
+     */
     public UniqueEmailOnUpdateValidator(ProfileDao profileDao) {
         this.profileDao = profileDao;
     }
 
+    /**
+     * 수정 대상 ID를 제외하고 이메일 중복 여부를 검증
+     *
+     * @param values 검증 대상 파라미터 배열
+     * @param context 검증 컨텍스트
+     * @return 검증 통과 여부
+     */
     @Override
     public boolean isValid(Object[] values, ConstraintValidatorContext context) {
         // 값이 없거나 파라미터가 2개 미만이면 검증 통과

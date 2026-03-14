@@ -5,6 +5,13 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class NotBlankIfPresentValidator implements ConstraintValidator<NotBlankIfPresent, String> {
 
+    /**
+     * 값이 존재할 경우 공백 문자열인지 검증
+     *
+     * @param value 검증할 문자열 값
+     * @param context 검증 컨텍스트
+     * @return 검증 통과 여부
+     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         // null이면 수정하지 않음

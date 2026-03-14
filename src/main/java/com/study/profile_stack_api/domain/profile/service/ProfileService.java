@@ -1,5 +1,8 @@
 package com.study.profile_stack_api.domain.profile.service;
 
+import com.study.profile_stack_api.domain.auth.dao.MemberDao;
+import com.study.profile_stack_api.domain.auth.entity.Member;
+import com.study.profile_stack_api.domain.auth.entity.Role;
 import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileSearchCondition;
@@ -13,6 +16,7 @@ import com.study.profile_stack_api.domain.profile.exception.DuplicateEmailExcept
 import com.study.profile_stack_api.domain.profile.exception.ProfileNotFoundException;
 import com.study.profile_stack_api.domain.profile.mapper.ProfileMapper;
 import com.study.profile_stack_api.global.common.Page;
+import com.study.profile_stack_api.global.exception.AuthException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +35,7 @@ public class ProfileService {
     /** 의존성 주입 */
     private final ProfileDao profileDao;
     private final ProfileMapper profileMapper;
+    private final MemberDao memberDao;
 
     /** 페이징 관련 상수 */
     private static final int MAX_PAGE_SIZE = 100;
@@ -42,7 +47,7 @@ public class ProfileService {
      * @param request 생성 요청 DTO
      * @return 생성된 프로필 응담 DTO
      */
-    public ProfileResponse createProfile(ProfileCreateRequest request) {
+    public ProfileResponse createProfile(ProfileCreateRequest request, String currentUsername) {
         // 이메일 유효성 검증
         if (profileDao.existsByEmail(request.getEmail())) {
             throw new DuplicateEmailException(request.getEmail());
@@ -50,6 +55,7 @@ public class ProfileService {
 
         // DTO -> Entity변환
         Profile profile = profileMapper.toEntity(request);
+        profile.setMemberId(getCurrentMemberId(currentUsername));
 
         // 저장
         Profile savedProfile = profileDao.save(profile);
@@ -266,7 +272,14 @@ public class ProfileService {
 
     // ==================== UPDATE ====================
 
-    public ProfileResponse updateProfile(Long id, ProfileUpdateRequest request) {
+    /**
+     * 프로필 수정
+     *
+     * @param id 수정할 프로필 ID
+     * @param request 수정 요청 데이터
+     * @return 수정된 프로필 응답
+     */
+    public ProfileResponse updateProfile(Long id, ProfileUpdateRequest request, String currentUsername) {
         Objects.requireNonNull(id);
         Objects.requireNonNull(request);
 
@@ -274,9 +287,9 @@ public class ProfileService {
         Profile profile = profileDao.findById(id)
                 .orElseThrow(() -> new ProfileNotFoundException(id));
 
-        // 이메일 유효성 검증
-        if (profileDao.existsByEmailAndIdNot(id, request.getEmail())) {
-            throw new DuplicateEmailException(request.getEmail());
+        // 소유권 검증: 현재 로그인한 사용자가 이 프로필의 소유주인지 확인
+        if (!profile.getMemberId().equals(getCurrentMemberId(currentUsername))) {
+            throw new AuthException("본인의 프로필만 수정할 수 있습니다.");
         }
 
         // 직무 유효성 검증
@@ -304,10 +317,14 @@ public class ProfileService {
      * @param id 삭제할 프로필 ID
      * @return 삭제 결과  응답
      */
-    public ProfileDeleteResponse deleteProfile(Long id) {
+    public ProfileDeleteResponse deleteProfile(Long id, String currentUsername) {
         // ID에 따른 프로필이 있는지 확인
-        if (!profileDao.existsById(id)) {
-            throw new ProfileNotFoundException(id);
+        Profile profile = profileDao.findById(id)
+                .orElseThrow(() -> new ProfileNotFoundException(id));
+
+        // 소유권 검증: 현재 로그인한 사용자가 이 프로필의 소유주인지 확인
+        if (!profile.getMemberId().equals(getCurrentMemberId(currentUsername))) {
+            throw new AuthException("본인의 프로필만 삭제할 수 있습니다.");
         }
 
         // 삭제 수행
@@ -322,7 +339,17 @@ public class ProfileService {
      *
      * @return 삭제 결과 응답
      */
-    public ProfileDeleteAllResponse deleteAllProfiles() {
+    public ProfileDeleteAllResponse deleteAllProfiles(String currentUsername) {
+        // 사용자 권한 확인
+        Role role = memberDao.findByUsername(currentUsername)
+                .orElseThrow(() -> new AuthException("사용자를 찾을 수 없습니다."))
+                .getRole();
+
+        // 관리자만 전체 삭제
+        if (role != Role.ADMIN) {
+            throw new AuthException("관리자만 전체 삭제를 할 수 있습니다.");
+        }
+
         // 프로필 총 개수 확인
         long deleteCount = profileDao.deleteAll();
 
@@ -343,5 +370,18 @@ public class ProfileService {
                 .filter(predicate)
                 .toList();
         return profiles;
+    }
+
+    /**
+     * 현재 로그인한 사용자의 회원 ID 조회
+     *
+     * @param username 현재 로그인한 사용자 이름
+     * @return 회원 ID
+     */
+    private Long getCurrentMemberId(String username) {
+        Member member = memberDao.findByUsername(username)
+                .orElseThrow(() -> new AuthException("사용자를 찾을 수 없습니다."));
+
+        return member.getId();
     }
 }

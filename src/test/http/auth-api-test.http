@@ -27,4 +27,57 @@ Content-Type: application/json
 ### 로그아웃
 POST http://localhost:8080/api/v1/auth/logout
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzMyODQxMywiZXhwIjoxNzczMzMwMjEzfQ.j5urPgCEZb_T_xWe-z7nWZ30Bzz-_BMxzEo5lIJdDE9cu6K0OLoHjHDz-m9SKfOT
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+
+### 프로필 생성
+POST http://localhost:8080/api/v1/profiles
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+
+{
+  "name": "이리액트",
+  "email": "react.lee@example.com2",
+  "bio": "사용자 경험을 중시하는 프론트엔드 개발자입니다.",
+  "position": "FRONTEND",
+  "careerYears": 2,
+  "githubUrl": "https://github.com/reactlee",
+  "blogUrl": ""
+}
+
+### 프로필 읽기
+GET http://localhost:8080/api/v1/profiles
+
+### 프로필 수정
+PUT http://localhost:8080/api/v1/profiles/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+
+{
+  "name": "김풀스택",
+  "email": "full.kim@example.com",
+  "bio": "풀스택 개발자입니다.",
+  "position": "FULLSTACK",
+  "careerYears": 10,
+  "githubUrl": "https://github.com/fullkim",
+  "blogUrl": "https://fullkim.dev"
+}
+
+### 다른 사용자 프로필 수정
+PUT http://localhost:8080/api/v1/profiles/2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+
+{
+  "name": "김풀스택",
+  "email": "full.kim@example.com2",
+  "bio": "풀스택 개발자입니다.",
+  "position": "FULLSTACK",
+  "careerYears": 10,
+  "githubUrl": "https://github.com/fullkim",
+  "blogUrl": "https://fullkim.dev"
+}
+
+### 프로필 삭제
+DELETE http://localhost:8080/api/v1/profiles/1
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+

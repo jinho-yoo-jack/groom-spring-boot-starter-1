@@ -22,6 +22,8 @@ public interface ProfileDao {
 
     Optional<Profile> findById(Long id);
 
+    Optional<Profile> findByMemberId(Long id);
+
     List<Profile> findByPosition(Position position);
 
     // ==================== PAGING ====================

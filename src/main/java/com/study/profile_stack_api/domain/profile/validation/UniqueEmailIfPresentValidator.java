@@ -10,10 +10,22 @@ public class UniqueEmailIfPresentValidator implements ConstraintValidator<Unique
 
     private final ProfileDao profileDao;
 
+    /**
+     * 이메일 중복 검증기 생성
+     *
+     * @param profileDao 프로필 조회 DAO
+     */
     public UniqueEmailIfPresentValidator(ProfileDao profileDao) {
         this.profileDao = profileDao;
     }
 
+    /**
+     * 값이 존재할 때만 이메일 중복 여부를 검증
+     *
+     * @param value 검증할 이메일 값
+     * @param context 검증 컨텍스트
+     * @return 검증 통과 여부
+     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         // null이면 수정 안 함

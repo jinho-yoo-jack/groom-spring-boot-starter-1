@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,10 +42,14 @@ public class TechStackController {
             Long profileId,
             @Valid
             @RequestBody
-            TechStackCreateRequest request
+            TechStackCreateRequest request,
+            @AuthenticationPrincipal
+            UserDetails userDetails
     ) {
         // Service 호출하여 기술 스택 생성
-        TechStackResponse response = techStackService.createTechStackByProfileId(profileId, request);
+        TechStackResponse response = techStackService.createTechStackByProfileId(
+                profileId, request, userDetails.getUsername()
+        );
 
         // 201 CREATED 상태코드와 함께 응답
         return ResponseEntity
@@ -185,10 +191,14 @@ public class TechStackController {
             Long id,
             @Valid
             @RequestBody
-            TechStackUpdateRequest request
+            TechStackUpdateRequest request,
+            @AuthenticationPrincipal
+            UserDetails userDetails
     ) {
         // Service 호출하여 ID로 기술 스택 수정
-        TechStackResponse response = techStackService.updateTechStackByProfileId(profileId, id, request);
+        TechStackResponse response = techStackService.updateTechStackByProfileId(
+                profileId, id, request, userDetails.getUsername()
+        );
 
         // 200 OK 상태 코드와 함께 응답
         return ResponseEntity.ok(ApiResponse.success(response));
@@ -205,9 +215,13 @@ public class TechStackController {
             @PathVariable
             Long profileId,
             @PathVariable
-            Long id
+            Long id,
+            @AuthenticationPrincipal
+            UserDetails userDetails
     ) {
-        TechStackDeleteResponse response = techStackService.deleteTechStackByProfileIdAndId(profileId, id);
+        TechStackDeleteResponse response = techStackService.deleteTechStackByProfileIdAndId(
+                profileId, id, userDetails.getUsername()
+        );
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -218,9 +232,13 @@ public class TechStackController {
     @DeleteMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> deleteAllTechStackByProfileId(
             @PathVariable
-            Long profileId
+            Long profileId,
+            @AuthenticationPrincipal
+            UserDetails userDetails
     ) {
-        Map<String, Object> response = techStackService.deleteAllTechStackByProfileId(profileId);
+        Map<String, Object> response = techStackService.deleteAllTechStackByProfileId(
+                profileId, userDetails.getUsername()
+        );
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

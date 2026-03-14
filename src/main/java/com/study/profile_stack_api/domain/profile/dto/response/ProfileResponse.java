@@ -16,13 +16,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @JsonPropertyOrder({
-        "id", "name", "email",
+        "id", "memberId", "name", "email",
         "bio", "position", "positionIcon",
         "careerYears", "githubUrl", "blogUrl",
         "createdAt", "updatedAt"
 })
 public class ProfileResponse {
     private Long id;
+    private Long memberId;
     private String name;
     private String email;
     private String bio;

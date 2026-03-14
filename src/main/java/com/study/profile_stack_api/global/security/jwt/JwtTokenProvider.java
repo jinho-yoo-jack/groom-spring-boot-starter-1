@@ -27,6 +27,13 @@ public class JwtTokenProvider {
     private final long accessTokenExpiration;
     private final long refreshTokenExpiration;
 
+    /**
+     * JWT 생성 및 검증에 필요한 설정값 초기화
+     *
+     * @param secret 서명용 시크릿 키
+     * @param accessTokenExpiration 액세스 토큰 만료 시간
+     * @param refreshTokenExpiration 리프레시 토큰 만료 시간
+     */
     public JwtTokenProvider(
             @Value("${jwt.secret}")
             String secret,

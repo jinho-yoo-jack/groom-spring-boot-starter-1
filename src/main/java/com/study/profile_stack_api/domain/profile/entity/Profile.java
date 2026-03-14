@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class Profile {
     private Long id;
+    private Long memberId;
     private String name;
     private String email;
     private String bio;

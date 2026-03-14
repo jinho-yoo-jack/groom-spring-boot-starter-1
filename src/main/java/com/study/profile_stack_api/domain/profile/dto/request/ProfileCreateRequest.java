@@ -25,7 +25,7 @@ public class ProfileCreateRequest {
     @Size(max = 500, message = "자기소개는 500자를 초과할 수 없습니다.")
     private String bio;
 
-    @NotNull(message = "직무는 필수입니다.")
+    @NotBlankIfPresent(message = "직무는 필수입니다.")
     private String position;
 
     @NotNull(message = "경력은 필수입니다.")

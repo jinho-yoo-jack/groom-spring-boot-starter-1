@@ -36,6 +36,13 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
+    /**
+     * Spring Security 필터 체인 구성
+     *
+     * @param http HttpSecurity 설정 객체
+     * @return 구성된 SecurityFilterChain
+     * @throws Exception 보안 설정 중 예외가 발생한 경우
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -48,10 +55,34 @@ public class SecurityConfig {
 
                 // 3. 인가 규칙
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/profiles/**").permitAll()
-                        .anyRequest().authenticated()
+                        auth
+                                // 로그아웃은 인증된 사용자만 가능
+                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout").authenticated()
+
+                                // 인증 관련 API는 로그인 전에도 접근 허용
+                                .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+
+                                // 프로필 및 기술 스택 조회 API는 누구나 접근 가능
+                                .requestMatchers(HttpMethod.GET, "/api/v1/profiles/**").permitAll()
+
+                                // 프로필 생성은 로그인한 사용자만 가능
+                                .requestMatchers(HttpMethod.POST, "/api/v1/profiles").authenticated()
+
+                                // 프로필 수정/삭제는 로그인한 사용자만 가능
+                                .requestMatchers(HttpMethod.PUT, "/api/v1/profiles/*").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/profiles").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/profiles/*").authenticated()
+
+                                // 기술 스택 생성은 로그인한 사용자만 가능
+                                .requestMatchers(HttpMethod.POST, "/api/v1/profiles/*/tech-stacks").authenticated()
+
+                                // 기술 스택 수정/삭제는 로그인한 사용자만 가능
+                                .requestMatchers(HttpMethod.PUT, "/api/v1/profiles/*/tech-stacks/*").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/profiles/*/tech-stacks").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, "/api/v1/profiles/*/tech-stacks/*").authenticated()
+
+                                // 정의되지 않은 나머지 요청은 모두 차단
+                                .anyRequest().denyAll()
                 )
 
                 // 4. 미인증 / 토큰 에러 시 JSON 응답
@@ -68,6 +99,13 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * AuthenticationManager 빈 등록
+     *
+     * @param configuration 인증 설정 객체
+     * @return AuthenticationManager
+     * @throws Exception 인증 매니저 생성 중 예외가 발생한 경우
+     */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
@@ -75,6 +113,11 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
+    /**
+     * 비밀번호 암호화를 위한 PasswordEncoder 빈 등록
+     *
+     * @return BCryptPasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

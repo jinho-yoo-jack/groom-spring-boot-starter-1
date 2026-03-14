@@ -7,7 +7,7 @@ server:
 # Spring 설정
 spring:
   application:
-    name: my-spring-study-diary
+    name: profile-stack-api
 
   servlet:
     encoding:

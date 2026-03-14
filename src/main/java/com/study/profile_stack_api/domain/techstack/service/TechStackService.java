@@ -1,6 +1,9 @@
 package com.study.profile_stack_api.domain.techstack.service;
 
+import com.study.profile_stack_api.domain.auth.dao.MemberDao;
+import com.study.profile_stack_api.domain.auth.entity.Member;
 import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
+import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.exception.ProfileNotFoundException;
 import com.study.profile_stack_api.domain.techstack.dao.TechStackDao;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackCreateRequest;
@@ -13,6 +16,7 @@ import com.study.profile_stack_api.domain.techstack.entity.TechStack;
 import com.study.profile_stack_api.domain.techstack.exception.TechStackNotFoundException;
 import com.study.profile_stack_api.domain.techstack.mapper.TechStackMapper;
 import com.study.profile_stack_api.global.common.Page;
+import com.study.profile_stack_api.global.exception.AuthException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +35,7 @@ public class TechStackService {
     /** 의존성 주입 */
     private final TechStackDao techStackDao;
     private final ProfileDao profileDao;
+    private final MemberDao memberDao;
     private final TechStackMapper techStackMapper;
 
     /** 페이징 관련 상수 */
@@ -45,10 +50,14 @@ public class TechStackService {
      * @param request 생성 요청 DTO
      * @return 생성된 기술 스택 응담 DTO
      */
-    public TechStackResponse createTechStackByProfileId(Long profileId, TechStackCreateRequest request) {
+    public TechStackResponse createTechStackByProfileId(
+            Long profileId,
+            TechStackCreateRequest request,
+            String currentUsername
+    ) {
 
         // FK 검증
-        validataProfileId(profileId);
+        validataProfile(profileId, currentUsername, "생성");
 
         // DTO -> Entity변환
         TechStack techStack = techStackMapper.toEntity(request);
@@ -69,9 +78,6 @@ public class TechStackService {
      * @return 프로필별 기술 스택 전체 응답 DTO 리스트
      */
     public List<TechStackResponse> getAllTechStacksByProfileId(Long profileId) {
-        // FK 검증
-        validataProfileId(profileId);
-
         // Repository에서 profileId에 해당하는 기술 스택만 조회
         List<TechStack> techStacks = techStackDao.findAllByProfileId(profileId);
 
@@ -89,9 +95,6 @@ public class TechStackService {
     public List<TechStackResponse> searchTechStackByProfileIdAndCategoryAndProficiency(
             Long profileId, String categoryKeyword, String proficiencyKeyword
     ) {
-        // FK 검증
-        validataProfileId(profileId);
-
         // Repository에서 모든 프로필 조회
         List<TechStack> techStacks = techStackDao.findAllByProfileId(profileId);
 
@@ -135,9 +138,6 @@ public class TechStackService {
      * @return 기술 스택 응답 DTO
      */
     public TechStackResponse getTechStackByProfileIdAndId(Long profileId, Long id) {
-        // FK 검증
-        validataProfileId(profileId);
-
         // Repository에서 profileId + id로 조회, 존재하지 않으면 예외 처리
         TechStack techStack = techStackDao.findByProfileIdAndId(profileId, id)
                 .orElseThrow(() -> new TechStackNotFoundException(id));
@@ -156,9 +156,6 @@ public class TechStackService {
      * @return 페이징된 기술 스택 응답
      */
     public Page<TechStackResponse> getTechStacksWithPaging(Long profileId, int page, int size) {
-        // FK 검증
-        validataProfileId(profileId);
-
         // 파라미터 유효성 검증
         page = Math.max(0, page);                           // 음수 방지
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1 ~ 100 범위
@@ -184,9 +181,6 @@ public class TechStackService {
     public Page<TechStackResponse> getTechStacksByCategoryWithPaging(
             Long profileId, String categoryName, int page, int size
     ) {
-        // FK 검증
-        validataProfileId(profileId);
-
         // 파라미터 유효성 검증
         page = Math.max(0, page);                           // 음수 방지
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1 ~ 100 범위
@@ -217,9 +211,6 @@ public class TechStackService {
      */
     public Page<TechStackResponse> searchTechStackWithPaging(
             Long profileId, String categoryKeyword, String proficiencyKeyword, int page, int size) {
-        // FK 검증
-        validataProfileId(profileId);
-
         // 파라미터 유효성 검증
         page = Math.max(0, page);                           // 음수 방지
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1 ~ 100 범위
@@ -263,13 +254,15 @@ public class TechStackService {
      * @param request 수정 요청 데이터
      * @return 수정된 기술 스택 응답
      */
-    public TechStackResponse updateTechStackByProfileId(Long profileId, Long id, TechStackUpdateRequest request) {
+    public TechStackResponse updateTechStackByProfileId(
+            Long profileId, Long id, TechStackUpdateRequest request, String currentUsername
+    ) {
         Objects.requireNonNull(profileId);
         Objects.requireNonNull(id);
         Objects.requireNonNull(request);
 
         // FK 검증
-        validataProfileId(profileId);
+        validataProfile(profileId, currentUsername, "수정");
 
         // 기존 기술 스택 조회
         TechStack techStack = techStackDao.findByProfileIdAndId(profileId, id)
@@ -310,9 +303,9 @@ public class TechStackService {
      * @param id 삭제할 기술 스택 ID
      * @return 삭제 결과  응답
      */
-    public TechStackDeleteResponse deleteTechStackByProfileIdAndId(Long profileId, Long id) {
+    public TechStackDeleteResponse deleteTechStackByProfileIdAndId(Long profileId, Long id, String currentUsername) {
         // FK 검증
-        validataProfileId(profileId);
+        validataProfile(profileId, currentUsername, "삭제");
 
         // ProfileId + ID에 따른 기술 스택이 있는지 확인
         techStackDao.findByProfileIdAndId(profileId, id)
@@ -331,9 +324,9 @@ public class TechStackService {
      * @param profileId 삭제할 프로필 ID
      * @return 삭제 결과 응답
      */
-    public Map<String, Object> deleteAllTechStackByProfileId(Long profileId) {
+    public Map<String, Object> deleteAllTechStackByProfileId(Long profileId, String currentUsername) {
         // FK 검증
-        validataProfileId(profileId);
+        validataProfile(profileId, currentUsername, "삭제");
 
         // 프로필 총 개수 확인
         long deleteCount = techStackDao.deleteAllByProfileId(profileId);
@@ -350,9 +343,25 @@ public class TechStackService {
     /**
      * 프로필과 기술 스택의 FK 검증
      */
-    private void validataProfileId(Long profileId) {
-        if (!profileDao.existsById(profileId)) {
-            throw new ProfileNotFoundException(profileId);
+    private void validataProfile(Long profileId, String username, String messageType) {
+        Profile profile = profileDao.findById(profileId)
+                .orElseThrow(() -> new ProfileNotFoundException(profileId));
+
+        if (!profile.getMemberId().equals(getCurrentMemberId(username))) {
+          throw new AuthException("본인의 테크스택만 " + messageType + "할 수 있습니다.");
         }
+    }
+
+    /**
+     * 현재 로그인한 사용자의 회원 ID 조회
+     *
+     * @param username 현재 로그인한 사용자 이름
+     * @return 회원 ID
+     */
+    private Long getCurrentMemberId(String username) {
+        Member member = memberDao.findByUsername(username)
+                .orElseThrow(() -> new AuthException("사용자를 찾을 수 없습니다."));
+
+        return member.getId();
     }
 }

@@ -28,6 +28,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberDao memberDao;
 
+    /**
+     * 사용자 이름으로 인증 대상 사용자 정보를 조회
+     *
+     * @param username 조회할 사용자 이름
+     * @return 스프링 시큐리티 사용자 정보
+     * @throws UsernameNotFoundException 사용자를 찾지 못한 경우
+     */
     @Override
     @NullMarked
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

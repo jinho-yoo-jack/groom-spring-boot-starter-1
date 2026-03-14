@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,10 +44,12 @@ public class ProfileController {
     public ResponseEntity<ApiResponse<ProfileResponse>> createProfile(
         @Valid
         @RequestBody
-        ProfileCreateRequest request
+        ProfileCreateRequest request,
+        @AuthenticationPrincipal
+        UserDetails userDetails
     ) {
         // Service 호출하여 프로필 생성
-        ProfileResponse response = profileService.createProfile(request);
+        ProfileResponse response = profileService.createProfile(request, userDetails.getUsername());
 
         // 201 CREATED 상태코드와 함께 응답
         return ResponseEntity
@@ -189,9 +193,11 @@ public class ProfileController {
         Long id,
         @Valid
         @RequestBody
-        ProfileUpdateRequest request
+        ProfileUpdateRequest request,
+        @AuthenticationPrincipal
+        UserDetails userDetails
     ) {
-        ProfileResponse response = profileService.updateProfile(id, request);
+        ProfileResponse response = profileService.updateProfile(id, request, userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -204,9 +210,11 @@ public class ProfileController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<ProfileDeleteResponse>> deleteProfile(
             @PathVariable
-            Long id
+            Long id,
+            @AuthenticationPrincipal
+            UserDetails userDetails
     ) {
-        ProfileDeleteResponse response = profileService.deleteProfile(id);
+        ProfileDeleteResponse response = profileService.deleteProfile(id, userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -215,8 +223,11 @@ public class ProfileController {
      * DELETE /api/v1/profiles
      */
     @DeleteMapping
-    public ResponseEntity<ApiResponse<ProfileDeleteAllResponse>> deleteAllProfiles() {
-        ProfileDeleteAllResponse response = profileService.deleteAllProfiles();
+    public ResponseEntity<ApiResponse<ProfileDeleteAllResponse>> deleteAllProfiles(
+            @AuthenticationPrincipal
+            UserDetails userDetails
+    ) {
+        ProfileDeleteAllResponse response = profileService.deleteAllProfiles(userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

@@ -37,6 +37,7 @@ class TechStackDaoPagingTest {
 
         // 테스트용 프로필 생성 (FK 대상)
         Profile profile = new Profile();
+        profile.setMemberId(1L);
         profile.setName("테스트 유저");
         profile.setEmail("test@test.com");
         profile.setBio("테스트");

@@ -21,10 +21,10 @@ public class TechStackCreateRequest {
     @Size(max = 50, message = "기술명은 50자를 초과할 수 없습니다.")
     private String name;
 
-    @NotNull(message = "기술 카테고리는 필수입니다.")
+    @NotBlankIfPresent(message = "기술 카테고리는 필수입니다.")
     private String category;
 
-    @NotNull(message = "숙련도는 필수입니다.")
+    @NotBlankIfPresent(message = "숙련도는 필수입니다.")
     private String proficiency;
 
     @NotNull(message = "사용 경험은 필수입니다.")

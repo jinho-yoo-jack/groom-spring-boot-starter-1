@@ -269,7 +269,6 @@ public class TechStackService {
                 .orElseThrow(() -> new TechStackNotFoundException(id));
 
         // 기술 카테고리 및 숙련도 유효성 검증
-        Proficiency proficiency = null;
         if (request.getCategory() != null) {
             try {
                 request.setCategory(TechCategory.valueOf(request.getCategory().toUpperCase()).name());

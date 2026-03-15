@@ -8,7 +8,6 @@ import lombok.*;
  * 프로필 생성 요청 DTO
  */
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

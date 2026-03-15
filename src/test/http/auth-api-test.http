@@ -27,12 +27,12 @@ Content-Type: application/json
 ### 로그아웃
 POST http://localhost:8080/api/v1/auth/logout
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzU2Njk1OSwiZXhwIjoxNzczNTY4NzU5fQ.et_ycKBXfwg3Yv4d3bAl-nmpTqsOrGC259kuqAXQdjDh3KPAMMY6ZIZDma2pMXw7
 
 ### 프로필 생성
 POST http://localhost:8080/api/v1/profiles
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzU2Njk1OSwiZXhwIjoxNzczNTY4NzU5fQ.et_ycKBXfwg3Yv4d3bAl-nmpTqsOrGC259kuqAXQdjDh3KPAMMY6ZIZDma2pMXw7
 
 {
   "name": "이리액트",
@@ -50,7 +50,7 @@ GET http://localhost:8080/api/v1/profiles
 ### 프로필 수정
 PUT http://localhost:8080/api/v1/profiles/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzU2Njk1OSwiZXhwIjoxNzczNTY4NzU5fQ.et_ycKBXfwg3Yv4d3bAl-nmpTqsOrGC259kuqAXQdjDh3KPAMMY6ZIZDma2pMXw7
 
 {
   "name": "김풀스택",
@@ -65,7 +65,7 @@ Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST
 ### 다른 사용자 프로필 수정
 PUT http://localhost:8080/api/v1/profiles/2
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzU2Njk1OSwiZXhwIjoxNzczNTY4NzU5fQ.et_ycKBXfwg3Yv4d3bAl-nmpTqsOrGC259kuqAXQdjDh3KPAMMY6ZIZDma2pMXw7
 
 {
   "name": "김풀스택",
@@ -79,5 +79,35 @@ Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST
 
 ### 프로필 삭제
 DELETE http://localhost:8080/api/v1/profiles/1
-Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzQ4NDE5NiwiZXhwIjoxNzczNDg1OTk2fQ.nAxGk59W0lAQRHzDiLsquqRH8FkX5qMwD2WBkMFWcZ_OSCJDsUEFCQpqf9olznAe
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzU2Njk1OSwiZXhwIjoxNzczNTY4NzU5fQ.et_ycKBXfwg3Yv4d3bAl-nmpTqsOrGC259kuqAXQdjDh3KPAMMY6ZIZDma2pMXw7
 
+### 기술 스택 생성
+POST http://localhost:8080/api/v1/profiles/1/tech-stacks
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzU2Njk1OSwiZXhwIjoxNzczNTY4NzU5fQ.et_ycKBXfwg3Yv4d3bAl-nmpTqsOrGC259kuqAXQdjDh3KPAMMY6ZIZDma2pMXw7
+
+{
+  "name": "Java",
+  "category": "LANGUAGE",
+  "proficiency": "ADVANCED",
+  "yearsOfExp": 3
+}
+
+### 기술 스택 조회
+GET http://localhost:8080/api/v1/profiles/4/tech-stacks
+
+### 기술 스택 수정
+PUT http://localhost:8080/api/v1/profiles/1/tech-stacks/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzU2Njk1OSwiZXhwIjoxNzczNTY4NzU5fQ.et_ycKBXfwg3Yv4d3bAl-nmpTqsOrGC259kuqAXQdjDh3KPAMMY6ZIZDma2pMXw7
+
+{
+  "name": "JavaScript",
+  "category": "LANGUAGE",
+  "proficiency": "ADVANCED",
+  "yearsOfExp": 3
+}
+
+### 기술 스택 삭제
+DELETE http://localhost:8080/api/v1/profiles/1/tech-stacks/1
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJqYXZha2ltIiwicm9sZXMiOiJST0xFX1VTRVIsRkFDVE9SX1BBU1NXT1JEIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTc3MzU2Njk1OSwiZXhwIjoxNzczNTY4NzU5fQ.et_ycKBXfwg3Yv4d3bAl-nmpTqsOrGC259kuqAXQdjDh3KPAMMY6ZIZDma2pMXw7

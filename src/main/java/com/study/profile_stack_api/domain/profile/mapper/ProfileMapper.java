@@ -12,6 +12,7 @@ import java.util.List;
 public interface ProfileMapper {
     @Mappings({
             @Mapping(target = "id", ignore = true),
+            @Mapping(target = "memberId", ignore = true),
             @Mapping(target = "createdAt", ignore = true),
             @Mapping(target = "updatedAt", ignore = true)
     })
@@ -25,6 +26,7 @@ public interface ProfileMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mappings({
             @Mapping(target = "id", ignore = true),
+            @Mapping(target = "memberId", ignore = true),
             @Mapping(target = "createdAt", ignore = true),
             @Mapping(target = "updatedAt", ignore = true)
     })

@@ -19,6 +19,10 @@ public class TechStack {
     private TechCategory category;
     private Proficiency proficiency;
     private Integer yearsOfExp;
+
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();;
 }

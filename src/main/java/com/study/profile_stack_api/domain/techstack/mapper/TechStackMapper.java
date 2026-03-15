@@ -10,6 +10,13 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface TechStackMapper {
+
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "profileId", ignore = true),
+            @Mapping(target = "createdAt", ignore = true),
+            @Mapping(target = "updatedAt", ignore = true)
+    })
     TechStack toEntity(TechStackCreateRequest request);
 
     @Mapping(target = "categoryIcon", expression = "java(techStack.getCategory().getIcon())")
@@ -19,5 +26,11 @@ public interface TechStackMapper {
     List<TechStackResponse> toResponseList(List<TechStack> techStacks);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "profileId", ignore = true),
+            @Mapping(target = "createdAt", ignore = true),
+            @Mapping(target = "updatedAt", ignore = true)
+    })
     void updateEntity(TechStackUpdateRequest request, @MappingTarget TechStack techStack);
 }

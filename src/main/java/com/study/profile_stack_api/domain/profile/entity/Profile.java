@@ -22,6 +22,10 @@ public class Profile {
     private Integer careerYears;
     private String githubUrl;
     private String blogUrl;
+
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 }

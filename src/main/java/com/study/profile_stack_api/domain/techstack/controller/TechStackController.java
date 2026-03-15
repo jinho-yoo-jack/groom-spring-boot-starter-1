@@ -2,6 +2,7 @@ package com.study.profile_stack_api.domain.techstack.controller;
 
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackCreateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
+import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteAllResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.service.TechStackService;
@@ -17,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 기술 스택 컨트롤러
@@ -230,13 +230,13 @@ public class TechStackController {
      * DELETE /api/v1/profiles/{profileId}/tech-stacks
      */
     @DeleteMapping
-    public ResponseEntity<ApiResponse<Map<String, Object>>> deleteAllTechStackByProfileId(
+    public ResponseEntity<ApiResponse<TechStackDeleteAllResponse>> deleteAllTechStackByProfileId(
             @PathVariable
             Long profileId,
             @AuthenticationPrincipal
             UserDetails userDetails
     ) {
-        Map<String, Object> response = techStackService.deleteAllTechStackByProfileId(
+        TechStackDeleteAllResponse response = techStackService.deleteAllTechStackByProfileId(
                 profileId, userDetails.getUsername()
         );
         return ResponseEntity.ok(ApiResponse.success(response));

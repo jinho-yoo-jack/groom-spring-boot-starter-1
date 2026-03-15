@@ -8,6 +8,7 @@ import com.study.profile_stack_api.domain.profile.exception.ProfileNotFoundExcep
 import com.study.profile_stack_api.domain.techstack.dao.TechStackDao;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackCreateRequest;
 import com.study.profile_stack_api.domain.techstack.dto.request.TechStackUpdateRequest;
+import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteAllResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackDeleteResponse;
 import com.study.profile_stack_api.domain.techstack.dto.response.TechStackResponse;
 import com.study.profile_stack_api.domain.techstack.entity.Proficiency;
@@ -22,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -323,7 +323,7 @@ public class TechStackService {
      * @param profileId 삭제할 프로필 ID
      * @return 삭제 결과 응답
      */
-    public Map<String, Object> deleteAllTechStackByProfileId(Long profileId, String currentUsername) {
+    public TechStackDeleteAllResponse deleteAllTechStackByProfileId(Long profileId, String currentUsername) {
         // FK 검증
         validataProfile(profileId, currentUsername, "삭제");
 
@@ -331,10 +331,7 @@ public class TechStackService {
         long deleteCount = techStackDao.deleteAllByProfileId(profileId);
 
         // 삭제 결과 반환
-        return Map.of(
-                "message", "전체 기술 스택이 성공적으로 삭제되었습니다.",
-                "deletedCount", deleteCount
-        );
+        return  TechStackDeleteAllResponse.of(deleteCount);
     }
 
     // ==================== VALIDATION ====================

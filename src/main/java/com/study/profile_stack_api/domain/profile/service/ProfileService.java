@@ -92,18 +92,17 @@ public class ProfileService {
 
         // 이름 검색어가 없거나 빈값이 아니면 필터링
         if (nameKeyword != null && !nameKeyword.isBlank()) {
-            profiles = filterProfiles(profiles, (profile) -> profile.getName().contains(nameKeyword));
+            profiles = filterProfiles( profiles, nameKeyword, (profile) ->
+                    profile.getName().contains(nameKeyword)
+            );
         }
 
         // 직무 검색어가 없거나 빈값이 아니면 필터링
         if (positionKeyword != null && !positionKeyword.isBlank()) {
-            Position position;
-            try {
-                position = Position.valueOf(positionKeyword.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 직무입니다: " + positionKeyword);
-            }
-            profiles = filterProfiles(profiles, (profile) -> profile.getPosition() == position);
+            Position position = parsePosition(positionKeyword);
+            profiles = filterProfiles(profiles, positionKeyword, (profile) ->
+                    profile.getPosition() == position
+            );
         }
 
         // Entity 리스트 -> Response DTO 리스트로 변환
@@ -133,14 +132,7 @@ public class ProfileService {
      */
     public List<ProfileResponse> getProfileByPosition(String positionName) {
         // 직무 이름으로 해당 직무 생성, 없는 직무면 예외 처리
-        Position position;
-        try {
-            position = Position.valueOf(positionName.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(
-                    "유효하지 않은 직무입니다: " + positionName
-            );
-        }
+        Position position = parsePosition(positionName);
 
         // Repository에서 직무로 조회
         List<Profile> profiles = profileDao.findByPosition(position);
@@ -234,11 +226,7 @@ public class ProfileService {
 
         String position = null;
         if (positionKeyword != null && !positionKeyword.isBlank()) {
-            try {
-                position = Position.valueOf(positionKeyword.toUpperCase()).name();
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 직무입니다: " + positionKeyword);
-            }
+            position = parsePositionName(positionKeyword);
         }
 
         // DAO에서 페이징된 Entity 조회
@@ -294,11 +282,7 @@ public class ProfileService {
 
         // 직무 유효성 검증
         if (request.getPosition() != null) {
-            try {
-                request.setPosition(Position.valueOf(request.getPosition().toUpperCase()).name());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 직무 입니다.");
-            }
+            request.setPosition(parsePositionName(request.getPosition()));
         }
 
         // Entity 업데이트 (Null이 아닌 값만 반영)
@@ -365,11 +349,18 @@ public class ProfileService {
      * @param profiles  프로필 리스트
      * @return 필터링된 프로필 리스트
      */
-    private List<Profile> filterProfiles(List<Profile> profiles, Predicate<Profile> predicate) {
-        profiles = profiles.stream()
+    private List<Profile> filterProfiles(
+            List<Profile> profiles,
+            String keyword,
+            Predicate<Profile> predicate
+    ) {
+        if (keyword == null || keyword.isBlank()) {
+            return profiles;
+        }
+
+        return profiles.stream()
                 .filter(predicate)
                 .toList();
-        return profiles;
     }
 
     /**
@@ -383,5 +374,23 @@ public class ProfileService {
                 .orElseThrow(() -> new AuthException("사용자를 찾을 수 없습니다."));
 
         return member.getId();
+    }
+
+    /**
+     * 직무 문자열을 Position으로 변환
+     */
+    private Position parsePosition(String positionName) {
+        try {
+            return Position.valueOf(positionName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 직무입니다: " + positionName);
+        }
+    }
+
+    /**
+     * 직무 문자열을 DB 저장용 enum 이름으로 변환
+     */
+    private String parsePositionName(String positionName) {
+        return parsePosition(positionName).name();
     }
 }

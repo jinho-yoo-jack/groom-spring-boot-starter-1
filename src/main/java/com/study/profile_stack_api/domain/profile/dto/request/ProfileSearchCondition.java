@@ -17,4 +17,8 @@ public class ProfileSearchCondition {
     private String position = null;
     private int page = 0;
     private int size = 0;
+
+    public static ProfileSearchCondition of(String name, String position, int page, int size) {
+        return new ProfileSearchCondition(name, position, page, size);
+    }
 }

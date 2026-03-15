@@ -73,7 +73,7 @@ public class ProfileController {
             String position
     ) {
         // 검색 상태 확인
-        ProfileSearchCondition condition = new ProfileSearchCondition(name, position, 0, 0);
+        ProfileSearchCondition condition = ProfileSearchCondition.of(name, position, 0, 0);
 
         // Service 호출하여 상태에 따른 전체 프로필 조회
         List<ProfileResponse> responses = profileService.getSearchProfiles(condition);
@@ -143,7 +143,7 @@ public class ProfileController {
             int size
     ) {
         // 검색 상태 확인
-        ProfileSearchCondition condition = new ProfileSearchCondition(name, position, page, size);
+        ProfileSearchCondition condition = ProfileSearchCondition.of(name, position, page, size);
 
         // Service 호출하여 상태에 따른 전체 프로필 페이징 조회
         Page<ProfileResponse> response = profileService.getSearchProfilesWithPaging(condition);

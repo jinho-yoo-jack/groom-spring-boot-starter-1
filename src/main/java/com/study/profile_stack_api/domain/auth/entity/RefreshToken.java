@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(of = "id")
 public class RefreshToken {
     private Long id;
-    private Long member_id;
+    private Long memberId;
     private String token;
-    private LocalDateTime expiry_date;
+    private LocalDateTime expiryDate;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

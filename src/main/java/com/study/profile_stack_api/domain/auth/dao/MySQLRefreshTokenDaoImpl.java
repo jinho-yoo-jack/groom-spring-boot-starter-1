@@ -28,11 +28,11 @@ public class MySQLRefreshTokenDaoImpl implements RefreshTokenDao {
     @Override
     public void saveRefreshToken(RefreshToken refreshToken) {
         String deleteSql = "DELETE FROM refresh_token WHERE member_id = ?";
-        jdbcTemplate.update(deleteSql, refreshToken.getMember_id());
+        jdbcTemplate.update(deleteSql, refreshToken.getMemberId());
 
         String insertSql = "INSERT INTO refresh_token (member_id, token, expiry_date) VALUES (?, ?, ?)";
-        jdbcTemplate.update(insertSql, refreshToken.getMember_id(), refreshToken.getToken(), refreshToken.getExpiry_date());
-        log.debug("Saved refresh token for member ID: {}", refreshToken.getMember_id());
+        jdbcTemplate.update(insertSql, refreshToken.getMemberId(), refreshToken.getToken(), refreshToken.getExpiryDate());
+        log.debug("Saved refresh token for member ID: {}", refreshToken.getMemberId());
     }
 
     // ==================== READ ====================
@@ -97,8 +97,8 @@ public class MySQLRefreshTokenDaoImpl implements RefreshTokenDao {
     private final RowMapper<RefreshToken> refreshTokenRowMapper = (rs, rowNum) ->
             RefreshToken.builder()
                     .id(rs.getLong("id"))
-                    .member_id(rs.getLong("member_id"))
+                    .memberId(rs.getLong("member_id"))
                     .token(rs.getString("token"))
-                    .expiry_date(rs.getTimestamp("expiry_date").toLocalDateTime())
+                    .expiryDate(rs.getTimestamp("expiry_date").toLocalDateTime())
                     .build();
 }

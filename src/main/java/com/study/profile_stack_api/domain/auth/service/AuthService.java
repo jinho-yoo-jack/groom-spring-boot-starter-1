@@ -13,6 +13,7 @@ import com.study.profile_stack_api.domain.auth.entity.RefreshToken;
 import com.study.profile_stack_api.domain.auth.entity.Role;
 import com.study.profile_stack_api.domain.auth.exception.DuplicateResourceException;
 import com.study.profile_stack_api.domain.auth.exception.InvalidTokenException;
+import com.study.profile_stack_api.domain.auth.mapper.AuthMapper;
 import com.study.profile_stack_api.global.exception.AuthException;
 import com.study.profile_stack_api.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class AuthService {
     private final RefreshTokenDao refreshTokenDao;
     private final MemberDao memberDao;
     private final PasswordEncoder passwordEncoder;
+    private final AuthMapper authMapper;
 
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiration;
@@ -103,21 +105,13 @@ public class AuthService {
             throw new DuplicateResourceException("이미 사용 중인 아이디입니다. (username: " + request.getUsername() + ")");
         }
 
-        Member newMember = Member.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .enabled(true)
-                .build();
-
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        Member newMember = authMapper.toEntity(request, encodedPassword);
         Member savedMember = memberDao.save(newMember);
 
         log.info("Member registered successfully: {}", savedMember.getUsername());
 
-        return SignupResponse.of(
-                savedMember.getId(),
-                savedMember.getUsername()
-        );
+        return authMapper.toResponse(savedMember);
     }
 
     /**

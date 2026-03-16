@@ -157,7 +157,7 @@ public class MySQLTechStackDaoImpl implements TechStackDao {
         String dataSql = """
                 SELECT * FROM tech_stack
                 WHERE profile_id = ? AND category = ?
-                ORDER BY created_at, id DESC
+                ORDER BY created_at DESC, id DESC
                 LIMIT ? OFFSET ?
                 """;
 

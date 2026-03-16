@@ -81,9 +81,9 @@ public class JwtTokenProvider {
                 .compact();
 
         return RefreshToken.builder()
-                .member_id(memberId)
+                .memberId(memberId)
                 .token(token)
-                .expiry_date(LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault()))
+                .expiryDate(LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault()))
                 .build();
     }
 

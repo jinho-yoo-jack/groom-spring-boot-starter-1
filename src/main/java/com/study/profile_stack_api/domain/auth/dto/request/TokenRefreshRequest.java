@@ -1,7 +1,7 @@
 package com.study.profile_stack_api.domain.auth.dto.request;
 
 
-import com.study.profile_stack_api.global.validation.NotBlankIfPresent;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +16,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TokenRefreshRequest {
 
-    @NotBlankIfPresent(message = "리프레시 토큰은 필수입니다.")
+    @NotBlank(message = "리프레시 토큰은 필수입니다.")
     private String refreshToken;
 }

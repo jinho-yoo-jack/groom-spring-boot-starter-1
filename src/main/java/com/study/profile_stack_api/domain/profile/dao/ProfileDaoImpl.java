@@ -17,13 +17,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
-/**
- * @deprecated
- * 추후 Paging 또한 JPA 기반으로 구현될 시,
- * 해당 jdbc 기반 코드는 삭제할 예정.
- */
-@Deprecated(forRemoval = true)
 @Repository
 public class ProfileDaoImpl implements ProfileDao {
     private final JdbcTemplate jdbcTemplate;

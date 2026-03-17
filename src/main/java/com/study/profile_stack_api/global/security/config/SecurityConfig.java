@@ -65,6 +65,9 @@ public class SecurityConfig {
                                 // 프로필 및 기술 스택 조회 API는 누구나 접근 가능
                                 .requestMatchers(HttpMethod.GET, "/api/v1/profiles/**").permitAll()
 
+                                // Swagger UI 및 API 문서 접근 허용
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+
                                 // 프로필 생성은 로그인한 사용자만 가능
                                 .requestMatchers(HttpMethod.POST, "/api/v1/profiles").authenticated()
 

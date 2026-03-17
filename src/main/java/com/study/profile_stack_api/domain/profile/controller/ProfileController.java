@@ -32,7 +32,7 @@ public class ProfileController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProfileResponse>> getProfileById(
             @PathVariable Long id ) {
-        ProfileResponse profileResponse = profileService.getProfilesById(id);
+        ProfileResponse profileResponse = profileService.getProfileById(id);
         return ResponseEntity.ok()
                 .body(ApiResponse.success(profileResponse));
     }

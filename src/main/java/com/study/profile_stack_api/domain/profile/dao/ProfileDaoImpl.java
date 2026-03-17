@@ -18,14 +18,19 @@ import java.util.List;
 import java.util.Optional;
 
 
-
+/**
+ * @deprecated
+ * 추후 Paging 또한 JPA 기반으로 구현될 시,
+ * 해당 jdbc 기반 코드는 삭제할 예정.
+ */
+@Deprecated(forRemoval = true)
 @Repository
 public class ProfileDaoImpl implements ProfileDao {
     private final JdbcTemplate jdbcTemplate;
 
     public ProfileDaoImpl(JdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
 
-
+    @Deprecated
     @Override
     public Profile save(Profile profile) {
         String sql = """
@@ -60,6 +65,7 @@ public class ProfileDaoImpl implements ProfileDao {
         return profile;
     }
 
+    @Deprecated
     @Override
     public Optional<Profile> findById(Long id) {
         String sql = """
@@ -75,6 +81,7 @@ public class ProfileDaoImpl implements ProfileDao {
         }
     }
 
+    @Deprecated
     @Override
     public List<Profile> findByPosition(String position) {
         String sql = """
@@ -86,6 +93,7 @@ public class ProfileDaoImpl implements ProfileDao {
         return jdbcTemplate.query(sql, profileRowMapper, position);
     }
 
+    @Deprecated
     @Override
     public Profile update(Profile profile) {
         String sql = """
@@ -109,16 +117,11 @@ public class ProfileDaoImpl implements ProfileDao {
             throw new ResourceNotFoundException(profile.getId());
         }
 
-        sql = """
-            select updated_at
-            from profile
-            where id = ?
-            """;
-        LocalDateTime updatedAt = jdbcTemplate.queryForObject(sql, LocalDateTime.class, profile.getId());
-        profile.setUpdatedAt(updatedAt);
+        profile.setUpdatedAt(LocalDateTime.now());
         return profile;
     }
 
+    @Deprecated
     @Override
     public boolean deleteById(Long id) {
         String sql = "delete from profile where id = ?";
@@ -126,6 +129,7 @@ public class ProfileDaoImpl implements ProfileDao {
         return deleted > 0;
     }
 
+    @Deprecated
     @Override
     public boolean existById(Long id) {
         String sql = "select count(*) from profile where id = ?";

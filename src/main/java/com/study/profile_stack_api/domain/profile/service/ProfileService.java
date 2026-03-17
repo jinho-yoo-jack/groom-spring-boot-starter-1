@@ -9,10 +9,12 @@ import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.exception.ResourceNotFoundException;
 import com.study.profile_stack_api.domain.profile.mapper.ProfileMapper;
+import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
 import com.study.profile_stack_api.global.common.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,43 +23,54 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class ProfileService {
     private static final int DEFAULT_PAGE_SIZE = 10;
     private static final int MAX_PAGE_SIZE = 100;
     private final ProfileDao profileDao;
+    private final ProfileRepository profileRepository;
     private final ProfileMapper profileMapper;
 
     // Create
+    @Transactional
     public ProfileResponse createProfile(ProfileCreateRequest request) {
         validationCreateRequest(request);
 
         Profile profile = profileMapper.toEntity(request);
 
-        Profile savedProfile = profileDao.save(profile);
+        Profile savedProfile = profileRepository.save(profile);
         return profileMapper.toResponse(savedProfile);
     }
 
     // Read
-    public ProfileResponse getProfilesById(Long id) {
-        Profile profile = profileDao.findById(id)
+    public ProfileResponse getProfileById(Long id) {
+        Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID : " + id));
 
         return profileMapper.toResponse(profile);
     }
 
 
-    public List<ProfileResponse> getProfilesByPosition(String position) {
-        List<Profile> profiles = profileDao.findByPosition(position);
+    public List<ProfileResponse> getProfilesByPosition(String positionName) {
+        Position position;
+        try {
+            position = Position.valueOf(positionName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 직무명 : " + positionName);
+        }
+
+        List<Profile> profiles = profileRepository.findByPosition(position);
 
         return profileMapper.toResponseList(profiles);
     }
 
     // Update
+    @Transactional
     public ProfileResponse updateProfile(Long id, ProfileUpdateRequest request) {
         Objects.requireNonNull(id);
         Objects.requireNonNull(request);
 
-        Profile profile = profileDao.findById(id)
+        Profile profile = profileRepository.findByIdOptimized(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 프로필을 찾을 수 없습니다. ID: " + id));
 
         if (request.hasNoUpdates()) {
@@ -68,17 +81,16 @@ public class ProfileService {
 
         profileMapper.updateEntityFromRequest(request, profile);
 
-        Profile updatedProfile = profileDao.update(profile);
-        return profileMapper.toResponse(updatedProfile);
+        return profileMapper.toResponse(profile);
     }
 
     // Delete
     public ProfileDeleteResponse deleteProfile(Long id) {
-        if (!profileDao.existById(id)) {
+        if (!profileRepository.existsById(id)) {
             throw new ResourceNotFoundException(id);
         }
 
-        profileDao.deleteById(id);
+        profileRepository.deleteById(id);
 
         return ProfileDeleteResponse.of(id);
     }

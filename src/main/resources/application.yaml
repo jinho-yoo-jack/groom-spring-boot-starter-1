@@ -31,6 +31,17 @@ spring:
       # platform: mysql
       encoding: UTF-8
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+        default_batch_fetch_size: 100
+    open-in-view: false
+
 logging:
   level:
     root: INFO

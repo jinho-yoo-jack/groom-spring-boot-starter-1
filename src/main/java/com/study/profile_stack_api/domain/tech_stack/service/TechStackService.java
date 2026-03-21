@@ -1,5 +1,6 @@
 package com.study.profile_stack_api.domain.tech_stack.service;
 
+import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.profile.exception.ResourceNotFoundException;
 import com.study.profile_stack_api.domain.tech_stack.dao.TechStackDao;
 import com.study.profile_stack_api.domain.tech_stack.dto.request.TechStackCreateRequest;
@@ -9,10 +10,13 @@ import com.study.profile_stack_api.domain.tech_stack.dto.response.TechStackRespo
 import com.study.profile_stack_api.domain.tech_stack.entity.Category;
 import com.study.profile_stack_api.domain.tech_stack.entity.Proficiency;
 import com.study.profile_stack_api.domain.tech_stack.entity.TechStack;
+import com.study.profile_stack_api.domain.tech_stack.mapper.TechStackMapper;
+import com.study.profile_stack_api.domain.tech_stack.repository.TechStackRepository;
 import com.study.profile_stack_api.global.common.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,55 +25,44 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TechStackService {
     private final TechStackDao techStackDao;
+    private final TechStackRepository techStackRepository;
+    private final TechStackMapper techStackMapper;
     private static final int MAX_PAGE_SIZE = 100;
 
     // Create
-    public TechStackResponse createTechStack(TechStackCreateRequest request, Long profileId) {
-        validationCreateRequest(request, profileId);
+    @Transactional
+    public TechStack createTechStack(TechStackCreateRequest request, Profile profile) {
+        validationCreateRequest(request, profile.getId());
 
-        TechStack techStack = TechStack.builder()
-                .id(null)
-                .profileId(profileId)
-                .name(request.getName())
-                .category(Category.valueOf(request.getCategory().toUpperCase()))
-                .proficiency(Proficiency.valueOf(request.getProficiency().toUpperCase()))
-                .yearsOfExp(request.getYearsOfExp())
-                .build();
+        TechStack techStack = techStackMapper.toEntity(request, profile);
+        techStackRepository.save(techStack);
 
-        TechStack saveTechStack = techStackDao.save(techStack);
-
-        return TechStackResponse.from(saveTechStack);
+        return techStack;
     }
 
     // Read
-    public TechStackResponse getTechStackById(Long profileId, Long id) {
-        TechStack techStack = techStackDao.findTechStackById(profileId ,id)
+    public TechStack getTechStackById(Long profileId, Long id) {
+        return techStackRepository.findByIdOptimized(profileId, id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로필 번호 혹은 ID : " + profileId + ", " + id));
-
-        return TechStackResponse.from(techStack);
     }
 
-    public Page<TechStackResponse> getTechStacksWithPaging(Long profileId, int page, int size) {
+    public Page<TechStack> getTechStacksWithPaging(Long profileId, int page, int size) {
         page = Math.max(0, page);
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);
 
-        Page<TechStack> techStackPage = techStackDao.findAllWithPaging(profileId, page, size);
-
-        List<TechStackResponse> content = techStackPage.getContent().stream()
-                .map(TechStackResponse::from)
-                .collect(Collectors.toList());
-
-        return new Page<>(content, page, size, techStackPage.getTotalElements());
+        return techStackDao.findAllWithPaging(profileId, page, size);
     }
 
     // Update
-    public TechStackResponse updateTechStack(Long id, Long profileId ,TechStackUpdateRequest request) {
+    @Transactional
+    public TechStack updateTechStack(Long id, Long profileId ,TechStackUpdateRequest request) {
         Objects.requireNonNull(id);
         Objects.requireNonNull(request);
 
-        TechStack techStack = techStackDao.findTechStackById(profileId ,id)
+        TechStack techStack = techStackRepository.findByIdOptimized(profileId ,id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Tech Stack을 찾을 수 없습니다. ID: " + id));
 
         if (request.hasNoUpdates()) {
@@ -78,48 +71,21 @@ public class TechStackService {
 
         validationUpdateRequest(request, profileId);
 
-        Category category = null;
-        Proficiency proficiency = null;
+        techStackMapper.updateEntityFromRequest(request, techStack);
 
-        if (request.getCategory() != null) {
-            try {
-                category = Category.valueOf(request.getCategory().toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 카테고리입니다");
-            }
-        }
-
-        if (request.getProficiency() != null) {
-            try {
-                proficiency = Proficiency.valueOf(request.getProficiency().toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 숙련도입니다");
-            }
-        }
-
-        techStack.update(
-                request.getName(),
-                category,
-                proficiency,
-                request.getYearsOfExp()
-        );
-
-        TechStack updatedTechStack = techStackDao.update(techStack);
-        return TechStackResponse.from(updatedTechStack);
+        return techStack;
     }
 
     // Delete
-    public TechStackDeleteResponse deleteTechStack(Long id, Long profileId) {
-        if (!techStackDao.exitsById(id)) {
+    public Long deleteTechStack(Long id, Long profileId) {
+        if (!techStackRepository.existsByIdAndProfileId(id, profileId)) {
             throw new ResourceNotFoundException(id);
         }
 
         techStackDao.deleteById(id);
 
-        return TechStackDeleteResponse.of(id);
+        return id;
     }
-
-
 
     // Validation
     public void validationCreateRequest(TechStackCreateRequest request, Long profileId) {

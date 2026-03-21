@@ -1,5 +1,6 @@
 package com.study.profile_stack_api.domain.tech_stack.dao;
 
+import com.study.profile_stack_api.domain.profile.entity.Profile;
 import com.study.profile_stack_api.domain.tech_stack.entity.Category;
 import com.study.profile_stack_api.domain.tech_stack.entity.Proficiency;
 import com.study.profile_stack_api.domain.tech_stack.entity.TechStack;
@@ -38,7 +39,7 @@ public class TechStackDaoImpl implements TechStackDao{
 
         jdbcTemplate.update(connect -> {
             PreparedStatement ps = connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, techStack.getProfileId());
+            ps.setLong(1, techStack.getProfile().getId());
             ps.setString(2, techStack.getName());
             ps.setString(3, techStack.getCategory().name());
             ps.setString(4, techStack.getProficiency().name());
@@ -96,7 +97,7 @@ public class TechStackDaoImpl implements TechStackDao{
     }
 
     @Override
-    public boolean exitsById(Long id) {
+    public boolean existsById(Long id) {
         String sql = """
                 select count(*)
                 from tech_stack
@@ -148,8 +149,11 @@ public class TechStackDaoImpl implements TechStackDao{
 
     public RowMapper<TechStack> techStackRowMapper = (rs, rowNum) -> {
         TechStack techStack = new TechStack();
+        Profile profileStub = new Profile();
+
+        profileStub.setId(rs.getLong("profile_id"));
         techStack.setId(rs.getLong("id"));
-        techStack.setProfileId(rs.getLong("profile_id"));
+        techStack.setProfile(profileStub);
         techStack.setName(rs.getString("name"));
         techStack.setCategory(Category.valueOf(rs.getString("category")));
         techStack.setProficiency(Proficiency.valueOf(rs.getString("proficiency")));

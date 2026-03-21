@@ -1,5 +1,6 @@
 package com.study.profile_stack_api.domain.tech_stack.controller;
 
+import com.study.profile_stack_api.domain.tech_stack.Facade.TechStackFacade;
 import com.study.profile_stack_api.domain.tech_stack.dto.request.TechStackCreateRequest;
 import com.study.profile_stack_api.domain.tech_stack.dto.request.TechStackUpdateRequest;
 import com.study.profile_stack_api.domain.tech_stack.dto.response.TechStackDeleteResponse;
@@ -20,14 +21,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class TechStackController {
-    private final TechStackService techStackService;
+    private final TechStackFacade techStackFacade;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<TechStackResponse>>> getTechStacksWithPaging(
             @PathVariable Long profileId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<TechStackResponse> responsePage = techStackService.getTechStacksWithPaging(profileId, page, size);
+        Page<TechStackResponse> responsePage = techStackFacade.getTechStacksWithPaging(profileId, page, size);
 
         return ResponseEntity.ok()
                 .body(ApiResponse.success(responsePage));
@@ -37,8 +38,7 @@ public class TechStackController {
     public ResponseEntity<ApiResponse<TechStackResponse>> createTechStack(
             @RequestBody TechStackCreateRequest request,
             @PathVariable Long profileId) {
-        TechStackResponse response = techStackService.createTechStack(request, profileId);
-
+        TechStackResponse response = techStackFacade.createTechStack(request, profileId);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
     }
@@ -47,8 +47,7 @@ public class TechStackController {
     public ResponseEntity<ApiResponse<TechStackResponse>> getTechStacksById(
             @PathVariable Long profileId,
             @PathVariable Long id ) {
-        TechStackResponse response = techStackService.getTechStackById(profileId, id);
-
+        TechStackResponse response = techStackFacade.getTechStackById(profileId, id);
         return ResponseEntity.ok()
                 .body(ApiResponse.success(response));
     }
@@ -58,7 +57,7 @@ public class TechStackController {
             @PathVariable Long id,
             @PathVariable Long profileId,
             @RequestBody TechStackUpdateRequest request) {
-        TechStackResponse response = techStackService.updateTechStack(id, profileId, request);
+        TechStackResponse response = techStackFacade.updateTechStack(id, profileId, request);
 
         return ResponseEntity.ok()
                 .body(ApiResponse.success(response));
@@ -68,7 +67,7 @@ public class TechStackController {
     public ResponseEntity<ApiResponse<TechStackDeleteResponse>> deleteTechStack(
             @PathVariable Long id,
             @PathVariable Long profileId) {
-        TechStackDeleteResponse response = techStackService.deleteTechStack(id, profileId);
+        TechStackDeleteResponse response = techStackFacade.deleteTechStack(id, profileId);
 
         return ResponseEntity.ok()
                 .body(ApiResponse.success(response));

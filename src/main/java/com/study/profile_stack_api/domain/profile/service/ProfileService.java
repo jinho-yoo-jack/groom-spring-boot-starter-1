@@ -43,11 +43,20 @@ public class ProfileService {
     }
 
     // Read
-    public ProfileResponse getProfileById(Long id) {
+    public ProfileResponse getProfileByIdToDto(Long id) {
         Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID : " + id));
 
         return profileMapper.toResponse(profile);
+    }
+
+    /**
+     * 타 Service 계층에서만 사용할 것.
+     * DB서 받아온 데이터를 Entity로 사용해야하는 경우.
+     */
+    public Profile getProfileByIdToEntity(Long id) {
+        return profileRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID : " + id));
     }
 
 

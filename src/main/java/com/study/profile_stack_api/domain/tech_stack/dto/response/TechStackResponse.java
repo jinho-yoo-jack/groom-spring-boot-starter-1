@@ -12,9 +12,9 @@ public class TechStackResponse {
     Long id;
     Long profileId;
     String name;
-    String category;
+    String categoryName;
     String categoryIcon;
-    String proficiency;
+    String proficiencyName;
     String proficiencyIcon;
     Integer yearsOfExp;
     LocalDateTime createdAt;
@@ -23,11 +23,11 @@ public class TechStackResponse {
     public static TechStackResponse from(TechStack techStack) {
         return TechStackResponse.builder()
                 .id(techStack.getId())
-                .profileId(techStack.getProfileId())
+                .profileId(techStack.getProfile().getId())
                 .name(techStack.getName())
-                .category(techStack.getCategory().name())
+                .categoryName(techStack.getCategory().name())
                 .categoryIcon(techStack.getCategory().getIcon())
-                .proficiency(techStack.getProficiency().name())
+                .proficiencyName(techStack.getProficiency().name())
                 .proficiencyIcon(techStack.getProficiency().getIcon())
                 .yearsOfExp(techStack.getYearsOfExp())
                 .createdAt(techStack.getCreatedAt())

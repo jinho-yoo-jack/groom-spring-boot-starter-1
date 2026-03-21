@@ -30,6 +30,5 @@ public interface ProfileDao {
     boolean existById(Long id);
 
     // Paging
-    // TODO : Paging 구현
     Page<Profile> findAllWithPaging(int page, int size);
 }

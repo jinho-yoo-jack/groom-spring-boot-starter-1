@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
     @Query("select p from Profile p where p.id = :id")

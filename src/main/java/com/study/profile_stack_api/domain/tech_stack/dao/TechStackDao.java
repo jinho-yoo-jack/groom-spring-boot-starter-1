@@ -13,7 +13,7 @@ public interface TechStackDao {
 
     TechStack update(TechStack techStack);
 
-    boolean exitsById(Long id);
+    boolean existsById(Long id);
 
     boolean deleteById(Long id);
 

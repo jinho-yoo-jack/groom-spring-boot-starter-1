@@ -1,9 +1,15 @@
 package com.study.profile_stack_api.global.exception;
 
 import com.study.profile_stack_api.global.common.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.security.sasl.AuthenticationException;
+import java.util.stream.Collectors;
 
 /**
  * 전역 예외 처리기
@@ -24,6 +30,57 @@ public class GlobalExceptionHandler {
             IllegalArgumentException e
     ) {
         return buildErrorResponse(ErrorCode.INVALID_INPUT, e.getMessage());
+    }
+
+    // MethodArgumentNotValidException 처리
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(
+        MethodArgumentNotValidException e
+    ) {
+        String errorMessage = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        return buildErrorResponse(ErrorCode.VALIDATION_ERROR, errorMessage);
+    }
+
+    // ConstraintViolationException 처리
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConstraintViolationException(
+            ConstraintViolationException e
+    ) {
+        String errorMessage = e.getConstraintViolations()
+                .stream()
+                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .collect(Collectors.joining(", "));
+
+        return buildErrorResponse(ErrorCode.VALIDATION_ERROR, errorMessage);
+    }
+
+    // BadCredentialsException 처리
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBadCredentials(
+            BadCredentialsException e
+    ) {
+        return buildErrorResponse(ErrorCode.BAD_CREDENTIALS, e.getMessage());
+    }
+
+    // AuthenticationException 처리
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthentication(
+            AuthenticationException e
+    ) {
+        return buildErrorResponse(ErrorCode.AUTHENTICATION_FAILED, e.getMessage());
+    }
+
+    // AuthException 처리
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAuthException(
+            AuthException e) {
+
+        return buildErrorResponse(e.getErrorCode(), e.getMessage());
     }
 
     // Exception 처리

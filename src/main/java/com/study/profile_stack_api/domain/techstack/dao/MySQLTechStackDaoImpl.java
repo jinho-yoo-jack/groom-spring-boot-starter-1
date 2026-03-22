@@ -1,11 +1,13 @@
 package com.study.profile_stack_api.domain.techstack.dao;
 
+import com.study.profile_stack_api.domain.profile.exception.ProfileNotFoundException;
+import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
 import com.study.profile_stack_api.domain.techstack.entity.Proficiency;
 import com.study.profile_stack_api.domain.techstack.entity.TechCategory;
 import com.study.profile_stack_api.domain.techstack.entity.TechStack;
+import com.study.profile_stack_api.domain.techstack.exception.TechStackNotFoundException;
 import com.study.profile_stack_api.global.common.Page;
-import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
-import com.study.profile_stack_api.global.exception.TechStackNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -22,12 +24,10 @@ import java.util.Optional;
  * MySQL 기반 TechStack DAO 구현
  */
 @Repository
+@RequiredArgsConstructor
 public class MySQLTechStackDaoImpl implements TechStackDao {
     public final JdbcTemplate jdbcTemplate;
-
-    public MySQLTechStackDaoImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final ProfileRepository profileRepository;
 
     // ==================== CREATE ====================
 
@@ -39,7 +39,7 @@ public class MySQLTechStackDaoImpl implements TechStackDao {
      */
     @Override
     public TechStack saveByProfileId(Long profileId, TechStack techStack) {
-        if (!existsById(profileId)) {
+        if (!profileRepository.existsById(profileId)) {
             throw new ProfileNotFoundException(profileId);
         }
 
@@ -157,7 +157,7 @@ public class MySQLTechStackDaoImpl implements TechStackDao {
         String dataSql = """
                 SELECT * FROM tech_stack
                 WHERE profile_id = ? AND category = ?
-                ORDER BY created_at, id DESC
+                ORDER BY created_at DESC, id DESC
                 LIMIT ? OFFSET ?
                 """;
 
@@ -289,7 +289,7 @@ public class MySQLTechStackDaoImpl implements TechStackDao {
      */
     @Override
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM profile WHERE id = ?";
+        String sql = "SELECT COUNT(*) FROM tech_stack WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
     }

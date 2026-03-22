@@ -7,7 +7,7 @@ server:
 # Spring 설정
 spring:
   application:
-    name: my-spring-study-diary
+    name: profile-stack-api
 
   servlet:
     encoding:
@@ -38,6 +38,17 @@ spring:
       data-locations: classpath:db/data.sql
       continue-on-error: false
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+        default_batch_fetch_size: 100
+    open-in-view: false
+
 # 로깅 설정
 logging:
   level:
@@ -45,3 +56,21 @@ logging:
     com.study.profile_stack_api: DEBUG
     org.springframework.jdbc: DEBUG
     com.zaxxer.hikari: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+
+# JWT 설정
+jwt:
+  secret: "YourBase64EncodedSecretKeyHereMustBeAtLeast256BitsLong!!"
+  access-token-expiration: 1_800_000    # 30분 (밀리초)
+  refresh-token-expiration: 604_800_000 # 7일 (밀리초)
+
+# Swagger UI 설정 추가
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+  packages-to-scan: com.study.profile_stack_api

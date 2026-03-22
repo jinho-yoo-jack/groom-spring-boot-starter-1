@@ -1,39 +1,47 @@
 package com.study.profile_stack_api.domain.profile.service;
 
-import com.study.profile_stack_api.domain.profile.dao.ProfileDao;
+import com.study.profile_stack_api.domain.auth.dao.MemberDao;
+import com.study.profile_stack_api.domain.auth.entity.Member;
+import com.study.profile_stack_api.domain.auth.entity.Role;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileCreateRequest;
+import com.study.profile_stack_api.domain.profile.dto.request.ProfileSearchCondition;
 import com.study.profile_stack_api.domain.profile.dto.request.ProfileUpdateRequest;
+import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteAllResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileDeleteResponse;
 import com.study.profile_stack_api.domain.profile.dto.response.ProfileResponse;
 import com.study.profile_stack_api.domain.profile.entity.Position;
 import com.study.profile_stack_api.domain.profile.entity.Profile;
+import com.study.profile_stack_api.domain.profile.exception.DuplicateEmailException;
+import com.study.profile_stack_api.domain.profile.exception.ProfileNotFoundException;
+import com.study.profile_stack_api.domain.profile.mapper.ProfileMapper;
+import com.study.profile_stack_api.domain.profile.repository.ProfileRepository;
 import com.study.profile_stack_api.global.common.Page;
-import com.study.profile_stack_api.global.exception.DuplicateEmailException;
-import com.study.profile_stack_api.global.exception.ProfileNotFoundException;
+import com.study.profile_stack_api.global.exception.AuthException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 /**
  * 프로필 서비스
  */
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ProfileService {
-    /** 의존성 주입: DAO 인터페이스 */
-    private final ProfileDao profileDao;
+    /** 의존성 주입 */
+    private final ProfileRepository profileRepository;
+    private final ProfileMapper profileMapper;
+    private final MemberDao memberDao;
 
     /** 페이징 관련 상수 */
     private static final int MAX_PAGE_SIZE = 100;
-
-    /**
-     * 생성자 주입
-     */
-    public ProfileService(ProfileDao profileDao) {
-        this.profileDao = profileDao;
-    }
 
     // ==================== CREATE ====================
 
@@ -42,27 +50,22 @@ public class ProfileService {
      * @param request 생성 요청 DTO
      * @return 생성된 프로필 응담 DTO
      */
-    public ProfileResponse createProfile(ProfileCreateRequest request) {
-        // 유효성 검증
-        validataCreateRequest(request);
+    public ProfileResponse createProfile(ProfileCreateRequest request, String currentUsername) {
+        // 이메일 유효성 검증
+        if (profileRepository.existsByEmailIgnoreCase(request.getEmail())) {
+            throw new DuplicateEmailException(request.getEmail());
+        }
 
         // DTO -> Entity변환
-        Profile profile = new Profile(
-                null,
-                request.getName(),
-                request.getEmail(),
-                request.getBio(),
-                Position.valueOf(request.getPosition()),
-                request.getCareerYears(),
-                request.getGithubUrl(),
-                request.getBlogUrl()
-        );
+        Profile profile = profileMapper.toEntity(request);
+        Member member = getCurrentMember(currentUsername);
+        profile.setMember(member);
 
         // 저장
-        Profile savedProfile = profileDao.save(profile);
+        Profile savedProfile = profileRepository.save(profile);
 
         // Entity -> Response DTO 변환 후 반환
-        return ProfileResponse.from(savedProfile);
+        return profileMapper.toResponse(savedProfile);
     }
 
     // ==================== READ ====================
@@ -74,12 +77,10 @@ public class ProfileService {
      */
     public List<ProfileResponse> getAllProfiles() {
         // Repository에서 모든 프로필 조회
-        List<Profile> profiles = profileDao.findAll();
+        List<Profile> profiles = profileRepository.findAllByOrderByCreatedAtDescIdDesc();
 
         // Entity 리스트 -> Response DTO 리스트로 변환
-        return profiles.stream()
-                .map(ProfileResponse::from)
-                .collect(Collectors.toList());
+        return profileMapper.toResponseList(profiles);
     }
 
     /**
@@ -91,33 +92,25 @@ public class ProfileService {
      */
     public List<ProfileResponse> searchProfiles(String nameKeyword, String positionKeyword) {
         // Repository에서 모든 프로필 조회
-        List<Profile> profiles = profileDao.findAll();
+        List<Profile> profiles = profileRepository.findAllByOrderByCreatedAtDescIdDesc();
 
         // 이름 검색어가 없거나 빈값이 아니면 필터링
         if (nameKeyword != null && !nameKeyword.isBlank()) {
-            profiles = profiles.stream()
-                    .filter(profile -> profile.getName().contains(nameKeyword))
-                    .toList();
+            profiles = filterProfiles( profiles, nameKeyword, (profile) ->
+                    profile.getName().contains(nameKeyword)
+            );
         }
 
         // 직무 검색어가 없거나 빈값이 아니면 필터링
         if (positionKeyword != null && !positionKeyword.isBlank()) {
-            Position position;
-            try {
-                position = Position.valueOf(positionKeyword.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 직무입니다: " + positionKeyword);
-            }
-
-            profiles = profiles.stream()
-                    .filter(profile -> profile.getPosition() == position)
-                    .toList();
+            Position position = parsePosition(positionKeyword);
+            profiles = filterProfiles(profiles, positionKeyword, (profile) ->
+                    profile.getPosition() == position
+            );
         }
 
         // Entity 리스트 -> Response DTO 리스트로 변환
-        return profiles.stream()
-                .map(ProfileResponse::from)
-                .collect(Collectors.toList());
+        return profileMapper.toResponseList(profiles);
     }
 
     /**
@@ -128,11 +121,11 @@ public class ProfileService {
      */
     public ProfileResponse getProfileById(Long id) {
         // Repository에서 ID로 조회, 존재하지 않으면 예외 처리
-        Profile profile = profileDao.findById(id)
+        Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new ProfileNotFoundException(id));
 
         // Entity -> Response DTO로 변환
-        return ProfileResponse.from(profile);
+        return profileMapper.toResponse(profile);
     }
 
     /**
@@ -143,22 +136,30 @@ public class ProfileService {
      */
     public List<ProfileResponse> getProfileByPosition(String positionName) {
         // 직무 이름으로 해당 직무 생성, 없는 직무면 예외 처리
-        Position position;
-        try {
-            position = Position.valueOf(positionName.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(
-                    "유효하지 않은 직무입니다: " + positionName
-            );
-        }
+        Position position = parsePosition(positionName);
 
         // Repository에서 직무로 조회
-        List<Profile> profiles = profileDao.findByPosition(position);
+        List<Profile> profiles = profileRepository.findByPositionOrderByCreatedAtDescIdDesc(position);
 
         // Entity 리스트 -> Response DTO 리스트로 변환
-        return profiles.stream()
-                .map(ProfileResponse::from)
-                .collect(Collectors.toList());
+        return profileMapper.toResponseList(profiles);
+    }
+
+    /**
+     * 검색 상태 확인 후 조건에 따라 프로필 조회
+     *
+     * @param condition 프로필 검색 상태
+     * @return 프로필 조회
+     */
+    public List<ProfileResponse> getSearchProfiles(ProfileSearchCondition condition) {
+        if ((condition.getName() != null && !condition.getName().isBlank()) ||
+                (condition.getPosition() != null && !condition.getPosition().isBlank())) {
+            // 조건에 맞는 프로필 조회
+            return searchProfiles(condition.getName(), condition.getPosition());
+        } else {
+            // 모든 프로필 조회
+            return getAllProfiles();
+        }
     }
 
     // ==================== PAGING ====================
@@ -176,12 +177,17 @@ public class ProfileService {
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1 ~ 100 범위
 
         // DAO에서 페이징된 Entity 조회
-        Page<Profile> profilePage = profileDao.findAllWithPaging(page, size);
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))
+        );
+
+        org.springframework.data.domain.Page<Profile> profilePage =
+                profileRepository.findAll(pageable);
 
         // Entity -> DTO 변환
-        List<ProfileResponse> content = profilePage.getContent().stream()
-                .map(ProfileResponse::from)
-                .toList();
+        List<ProfileResponse> content = profileMapper.toResponseList(profilePage.getContent());
 
         // Page<Entity>를 Page<DTO>로 변환 및 반환
         return new Page<>(content, page, size, profilePage.getTotalElements());
@@ -206,12 +212,19 @@ public class ProfileService {
         }
 
         // DAO에서 페이징된 Entity 조회
-        Page<Profile> profilePage = profileDao.findByPositionWithPaging(positionName.toUpperCase(), page, size);
+        Position position = parsePosition(positionName);
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))
+        );
+
+        org.springframework.data.domain.Page<Profile> profilePage =
+                profileRepository.findByPosition(position, pageable);
 
         // Entity -> DTO 변환
-        List<ProfileResponse> content = profilePage.getContent().stream()
-                .map(ProfileResponse::from)
-                .toList();
+        List<ProfileResponse> content = profileMapper.toResponseList(profilePage.getContent());
 
         // Page<Entity>를 Page<DTO>로 변환 및 반환
         return new Page<>(content, page, size, profilePage.getTotalElements());
@@ -231,70 +244,80 @@ public class ProfileService {
         page = Math.max(0, page);                           // 음수 방지
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1 ~ 100 범위
 
-        String position = null;
+        Position position = null;
         if (positionKeyword != null && !positionKeyword.isBlank()) {
-            try {
-                position = Position.valueOf(positionKeyword.toUpperCase()).name();
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 직무입니다: " + positionKeyword);
-            }
+            position = parsePosition(positionKeyword);
         }
 
         // DAO에서 페이징된 Entity 조회
-        Page<Profile> profilePage = profileDao.searchWithPaging(nameKeyword, position, page, size);
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"))
+        );
+
+        org.springframework.data.domain.Page<Profile> profilePage =
+                profileRepository.search(nameKeyword, position, pageable);
 
         // Entity -> DTO 변환
-        List<ProfileResponse> content = profilePage.getContent().stream()
-                .map(ProfileResponse::from)
-                .toList();
+        List<ProfileResponse> content = profileMapper.toResponseList(profilePage.getContent());
 
         // Page<Entity>를 Page<DTO>로 변환 및 반환
         return new Page<>(content, page, size, profilePage.getTotalElements());
 
     }
 
+    /**
+     * 검색 상태 확인 후 조건에 따라 프로필 페이지 조회
+     *
+     * @param condition 프로필 검색 상태
+     * @return 페이지 조회
+     */
+    public Page<ProfileResponse> getSearchProfilesWithPaging(ProfileSearchCondition condition) {
+        if ((condition.getName() != null && !condition.getName().isBlank()) ||
+                (condition.getPosition() != null && !condition.getPosition().isBlank())) {
+            // 조건에 맞는 프로필 페이징 조회
+            return searchProfilesWithPaging(
+                    condition.getName(), condition.getPosition(), condition.getPage(), condition.getSize());
+        } else {
+            // 전체 프로필 페이징 조회
+            return getProfilesWithPaging(condition.getPage(), condition.getSize());
+        }
+    }
+
     // ==================== UPDATE ====================
 
-    public ProfileResponse updateProfile(Long id, ProfileUpdateRequest request) {
+    /**
+     * 프로필 수정
+     *
+     * @param id 수정할 프로필 ID
+     * @param request 수정 요청 데이터
+     * @return 수정된 프로필 응답
+     */
+    public ProfileResponse updateProfile(Long id, ProfileUpdateRequest request, String currentUsername) {
         Objects.requireNonNull(id);
         Objects.requireNonNull(request);
 
         // 기존 프로필 조회
-        Profile profile = profileDao.findById(id)
+        Profile profile = profileRepository.findById(id)
                 .orElseThrow(() -> new ProfileNotFoundException(id));
 
-        // 수정 내용 있는지 확인
-        if (request.hashNoUpdates()) {
-            throw new IllegalArgumentException("수정 내용이 없습니다.");
+        // 소유권 검증: 현재 로그인한 사용자가 이 프로필의 소유주인지 확인
+        if (!profile.getMember().equals(getCurrentMember(currentUsername))) {
+            throw new AuthException("본인의 프로필만 수정할 수 있습니다.");
         }
 
-        // 수정값 유효성 검증
-        validataUpdateRequest(request);
-
-        // 직무 변환 (Null 아닌 경우에만)
-        Position position = null;
+        // 직무 유효성 검증
         if (request.getPosition() != null) {
-            try {
-                position = Position.valueOf(request.getPosition().toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 직무 입니다.");
-            }
+            request.setPosition(parsePositionName(request.getPosition()));
         }
 
         // Entity 업데이트 (Null이 아닌 값만 반영)
-        profile.update(
-                request.getName(),
-                request.getEmail(),
-                request.getBio(),
-                position,
-                request.getCareerYears(),
-                request.getGithubUrl(),
-                request.getBlogUrl()
-        );
+        profileMapper.updateEntity(request, profile);
 
         // 저장 및 응답 반환
-        Profile updatedProfile = profileDao.update(profile);
-        return ProfileResponse.from(updatedProfile);
+        Profile updatedProfile = profileRepository.save(profile);
+        return profileMapper.toResponse(updatedProfile);
     }
 
     // ==================== DELETE ====================
@@ -305,17 +328,21 @@ public class ProfileService {
      * @param id 삭제할 프로필 ID
      * @return 삭제 결과  응답
      */
-    public ProfileDeleteResponse deleteProfile(Long id) {
+    public ProfileDeleteResponse deleteProfile(Long id, String currentUsername) {
         // ID에 따른 프로필이 있는지 확인
-        if (!profileDao.existsById(id)) {
-            throw new ProfileNotFoundException(id);
+        Profile profile = profileRepository.findById(id)
+                .orElseThrow(() -> new ProfileNotFoundException(id));
+
+        // 소유권 검증: 현재 로그인한 사용자가 이 프로필의 소유주인지 확인
+        if (!profile.getMember().equals(getCurrentMember(currentUsername))) {
+            throw new AuthException("본인의 프로필만 삭제할 수 있습니다.");
         }
 
         // 삭제 수행
-        boolean isDeleted = profileDao.deleteById(id);
+        profileRepository.delete(profile);
 
         // 삭제 결과 반환
-        return ProfileDeleteResponse.of(id, isDeleted);
+        return ProfileDeleteResponse.of(id, true);
     }
 
     /**
@@ -323,88 +350,73 @@ public class ProfileService {
      *
      * @return 삭제 결과 응답
      */
-    public Map<String, Object> deleteAllProfiles() {
+    public ProfileDeleteAllResponse deleteAllProfiles(String currentUsername) {
+        // 사용자 권한 확인
+        Role role = memberDao.findByUsername(currentUsername)
+                .orElseThrow(() -> new AuthException("사용자를 찾을 수 없습니다."))
+                .getRole();
+
+        // 관리자만 전체 삭제
+        if (role != Role.ADMIN) {
+            throw new AuthException("관리자만 전체 삭제를 할 수 있습니다.");
+        }
+
         // 프로필 총 개수 확인
-        long deleteCount = profileDao.deleteAll();
+        long deleteCount = profileRepository.count();
+        profileRepository.deleteAll();
 
         // 삭제 결과 반환
-        return Map.of(
-                "message", "전체 프로필이 성공적으로 삭제되었습니다.",
-                "deletedCount", deleteCount
-        );
+        return ProfileDeleteAllResponse.of(deleteCount);
     }
 
-    // ==================== VALIDATION ====================
+    // ==================== PRIVATE METHODS ====================
 
     /**
-     * 생성 요청 유효성 검증
+     * 범용 필터
+     *
+     * @param profiles  프로필 리스트
+     * @return 필터링된 프로필 리스트
      */
-    private void validataCreateRequest(ProfileCreateRequest request) {
-        if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("이름은 필수입니다.");
+    private List<Profile> filterProfiles(
+            List<Profile> profiles,
+            String keyword,
+            Predicate<Profile> predicate
+    ) {
+        if (keyword == null || keyword.isBlank()) {
+            return profiles;
         }
 
-        if (request.getName().length() > 50) {
-            throw new IllegalArgumentException("이름은 50자를 초과할 수 없습니다.");
-        }
+        return profiles.stream()
+                .filter(predicate)
+                .toList();
+    }
 
-        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("이메일은 필수입니다.");
-        }
+    /**
+     * 현재 로그인한 사용자 정보 조회
+     *
+     * @param username 현재 로그인한 사용자 이름
+     * @return 회원 엔티티
+     */
+    private Member getCurrentMember(String username) {
+        return memberDao.findByUsername(username)
+                .orElseThrow(() -> new AuthException("사용자를 찾을 수 없습니다."));
+    }
 
-        if (request.getEmail().length() > 100) {
-            throw new IllegalArgumentException("이메일은 100자를 초과할 수 없습니다.");
-        }
-
-        if (profileDao.existsByEmail(request.getEmail())) {
-            throw new DuplicateEmailException(request.getEmail());
-        }
-
-        if (request.getBio().length() > 500) {
-            throw new IllegalArgumentException("자기소개는 500자를 초과할 수 없습니다.");
-        }
-
-        if (request.getPosition() == null || request.getPosition().trim().isEmpty()) {
-            throw new IllegalArgumentException("직무는 필수입니다.");
-        }
-
-        if (request.getCareerYears() == null || request.getCareerYears() < 0) {
-            throw new IllegalArgumentException("경력은 0년 이상이어야 합니다.");
+    /**
+     * 직무 문자열을 Position으로 변환
+     */
+    private Position parsePosition(String positionName) {
+        try {
+            return Position.valueOf(positionName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 직무입니다: " + positionName);
         }
     }
 
-    public void validataUpdateRequest(ProfileUpdateRequest request) {
-        if (request.getName() != null) {
-            if (request.getName().trim().isEmpty()) {
-                throw new IllegalArgumentException("이름은 빈 값일 수 없습니다.");
-            }
-            if (request.getName().length() > 50) {
-                throw new IllegalArgumentException("이름은 50자를 초과할 수 없습니다.");
-            }
-        }
-
-        if (request.getEmail() != null) {
-            if (request.getEmail().trim().isEmpty()) {
-                throw new IllegalArgumentException("이메일은 빈 값일 수 없습니다.");
-            }
-            if (request.getEmail().length() > 100) {
-                throw new IllegalArgumentException("이메일은 100자를 초과할 수 없습니다.");
-            }
-            if (profileDao.existsByEmail(request.getEmail())) {
-                throw new DuplicateEmailException(request.getEmail());
-            }
-        }
-
-        if (request.getBio() != null && request.getBio().length() > 500) {
-            throw new IllegalArgumentException("자기소개는 500자를 초과할 수 없습니다.");
-        }
-
-        if (request.getPosition() != null && request.getPosition().trim().isEmpty()) {
-            throw new IllegalArgumentException("직무는 빈 값일 수 없습니다.");
-        }
-
-        if (request.getCareerYears() != null && request.getCareerYears() < 0) {
-            throw new IllegalArgumentException("경력은 0년 이상이어야 합니다.");
-        }
+    /**
+     * 직무 문자열을 DB 저장용 enum 이름으로 변환
+     */
+    private String parsePositionName(String positionName) {
+        return parsePosition(positionName).name();
     }
 }
